@@ -914,26 +914,188 @@ function vencBadge(venc,pago){
 }
 
 // ── Dashboard ──
-function renderDash(){
-  const gt=GT(); const prev=D.prevRec||0; const emC=D.emConta||0; const rec=D.recebido||0;
-  gi('dash-mes-label').textContent=mesLabel(mesAtivo);
-  gi('dash-stats').innerHTML=`
-    <div class="stat-card"><div class="stat-val red">${brl(gt)}</div><div class="stat-lbl">Total a pagar</div></div>
-    <div class="stat-card"><div class="stat-val">${brl(prev)}</div><div class="stat-lbl">Prev. receita</div></div>
-    <div class="stat-card"><div class="stat-val green">${brl(rec)}</div><div class="stat-lbl">Recebido</div></div>
-    <div class="stat-card"><div class="stat-val" style="color:${(rec-gt)>=0?'var(--green)':'var(--red)'};">${brl(rec-gt)}</div><div class="stat-lbl">Saldo</div></div>`;
+function getVencimentos(){
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const items = [];
+  const add = (cat, arr) => (arr||[]).forEach(x => {
+    if(x.pago || !x.venc) return;
+    const d = new Date(x.venc+'T00:00:00');
+    const diff = Math.ceil((d - hoje) / 86400000);
+    if(diff >= -3 && diff <= 5) items.push({cat, desc: x.desc, val: x.val||x.total||0, diff, venc: x.venc});
+  });
+  add('Boleto',       D.boletos);
+  add('Link/Emp.',    D.links);
+  add('Cartão emp.',  D.cartoes);
+  add('Empréstimo',   D.emprestimos);
+  add('Empresa',      D.empresa);
+  add('Pessoal',      D.pessoal);
+  add('Cartão pes.',  D.cartoesPes);
+  (D.gruposEmp||[]).forEach(g => add(g.titulo||'Empresa', (g.itens||[]).filter(x=>x.tipo==='pagar')));
+  (D.grupos||[]).forEach(g => add(g.titulo||'Pessoal', (g.itens||[]).filter(x=>x.tipo==='pagar')));
+  return items.sort((a,b) => a.diff - b.diff);
+}
 
-  // Summary cards
-  const items=[
-    {label:'Funcionários', val:tFunc(), count:(D.funcionarios||[]).filter(f=>!f.pago).length},
-    {label:'Boletos', val:tArr(D.boletos), count:(D.boletos||[]).filter(x=>!x.pago).length},
-    {label:'Cartões Emp.', val:tArr(D.cartoes), count:(D.cartoes||[]).filter(x=>!x.pago).length},
-    {label:'Contas Pessoal', val:tArr(D.pessoal)+tArr(D.cartoesPes), count:(D.pessoal||[]).filter(x=>!x.pago).length},
-  ];
-  gi('dash-cards').innerHTML=items.map(it=>`<div class="stat-card">
-    <div class="card-title" style="margin-bottom:6px;">${it.label} <span style="font-size:11px;color:var(--text3);">${it.count} pendente${it.count!==1?'s':''}</span></div>
-    <div style="font-size:18px;font-weight:700;color:var(--red);font-family:'DM Mono',monospace;">${brl(it.val)}</div>
-  </div>`).join('');
+function vencStatus(diff){
+  if(diff < 0)  return { label: `Venceu há ${Math.abs(diff)}d`, cls: 'venc-late' };
+  if(diff === 0) return { label: 'Vence hoje!', cls: 'venc-late' };
+  if(diff <= 2)  return { label: `Em ${diff}d`, cls: 'venc-soon' };
+  return { label: `Em ${diff}d`, cls: 'venc-ok' };
+}
+
+function renderDash(){
+  const gt=GT(); const prev=D.prevRec||0; const rec=D.recebido||0;
+  gi('dash-mes-label').textContent=mesLabel(mesAtivo);
+
+  // ── Top stats ──
+  gi('dash-stats').innerHTML=`
+    <div class="stat-card">
+      <div class="stat-lbl" style="margin-bottom:4px;">Total a pagar</div>
+      <div class="stat-val red">${brl(gt)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl" style="margin-bottom:4px;">Prev. receita</div>
+      <div class="stat-val">${brl(prev)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl" style="margin-bottom:4px;">Recebido</div>
+      <div class="stat-val green">${brl(rec)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl" style="margin-bottom:4px;">Saldo</div>
+      <div class="stat-val" style="color:${(rec-gt)>=0?'var(--green)':'var(--red)'};">${brl(rec-gt)}</div>
+    </div>`;
+
+  // ── Vencimentos próximos ──
+  const vencs = getVencimentos();
+  let vencHtml = '';
+  if(vencs.length){
+    const rows = vencs.map(v => {
+      const s = vencStatus(v.diff);
+      return `<div style="display:grid;grid-template-columns:100px 1fr auto auto;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--text3);">${v.cat}</span>
+        <span style="font-size:13px;font-weight:500;">${v.desc}</span>
+        <span style="font-size:13px;font-family:'DM Mono',monospace;font-weight:600;">${brl(v.val)}</span>
+        <span class="venc-badge ${s.cls}">${s.label}</span>
+      </div>`;
+    }).join('');
+    vencHtml = `<div class="card" style="border-left:3px solid #ef4444;margin-bottom:14px;">
+      <div class="card-title" style="color:#c0392b;margin-bottom:10px;">
+        <span>⚠️ Vencimentos próximos</span>
+        <span style="font-size:11px;font-weight:400;color:var(--text3);">${vencs.length} conta${vencs.length>1?'s':''}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text3);display:grid;grid-template-columns:100px 1fr auto auto;gap:10px;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:2px;">
+        <span>CATEGORIA</span><span>DESCRIÇÃO</span><span>VALOR</span><span>STATUS</span>
+      </div>
+      ${rows}
+    </div>`;
+  }
+
+  // ── Categorias para resumo ──
+  const tEmpBol  = tArr(D.boletos);
+  const tEmpLink = tArr(D.links);
+  const tEmpCart = tArr(D.cartoes);
+  const tEmprest = tArr(D.emprestimos);
+  const tEmpOut  = tArr(D.empresa);
+  const tGrupsEmp= (D.gruposEmp||[]).reduce((t,g)=>t+tArr((g.itens||[]).filter(x=>x.tipo==='pagar')),0);
+  const totalEmp = tEmpBol+tEmpLink+tEmpCart+tEmprest+tEmpOut+tGrupsEmp;
+
+  const tPesContas= tArr(D.pessoal);
+  const tPesCart  = tArr(D.cartoesPes);
+  const tPesEmp   = (D.grupos||[]).reduce((t,g)=>t+tArr((g.itens||[]).filter(x=>x.tipo==='pagar')),0);
+  const totalPes  = tPesContas+tPesCart+tPesEmp;
+
+  const tFuncs = tFunc();
+  const totalGeral = totalEmp + totalPes + tFuncs;
+  const maxVal = Math.max(tEmpBol,tEmpLink,tEmpCart,tEmprest,tEmpOut,tPesContas,tPesCart,tFuncs,1);
+
+  const barRow=(label,val,color)=>{
+    const pct=Math.round((val/maxVal)*100);
+    return val>0?`<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:12px;color:var(--text2);width:120px;flex-shrink:0;">${label}</span>
+      <div style="flex:1;background:var(--surface2);border-radius:3px;height:6px;overflow:hidden;">
+        <div style="width:${pct}%;background:${color};height:100%;border-radius:3px;transition:width .4s;"></div>
+      </div>
+      <span style="font-size:12px;font-family:'DM Mono',monospace;font-weight:600;min-width:90px;text-align:right;">${brl(val)}</span>
+    </div>`:'';
+  };
+
+  const resumoRow=(label,val,isTotal,isGroup)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:${isGroup?'10px':'6px'} 0;
+      border-bottom:1px solid var(--border);${isGroup?'margin-top:4px;':''}"
+    >
+      <span style="font-size:${isGroup?'13px':'12.5px'};font-weight:${isTotal?700:isGroup?600:400};color:${isTotal?'var(--red)':isGroup?'var(--text)':'var(--text2)'};">
+        ${isGroup?'<strong>':''}${label}${isGroup?'</strong>':''}
+      </span>
+      <span style="font-size:${isTotal?'14px':'13px'};font-weight:${isTotal||isGroup?700:500};
+        color:${isTotal?'var(--red)':'var(--text)'};font-family:'DM Mono',monospace;">${brl(val)}</span>
+    </div>`;
+
+  gi('dash-cards').innerHTML = `
+    ${vencHtml}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+      <!-- Resumo -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">📋 Resumo do mês</div>
+
+        <div style="background:var(--accent-bg);border-radius:8px;padding:8px 12px;margin-bottom:8px;">
+          <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px;">🏪 EMPRESA</div>
+          ${tEmpBol  >0?resumoRow('Boletos',tEmpBol,false,false):''}
+          ${tEmpLink >0?resumoRow('Links/Emp.',tEmpLink,false,false):''}
+          ${tEmpCart >0?resumoRow('Cartões emp.',tEmpCart,false,false):''}
+          ${tEmprest >0?resumoRow('Empréstimos',tEmprest,false,false):''}
+          ${tEmpOut  >0?resumoRow('Outras contas',tEmpOut,false,false):''}
+          ${tGrupsEmp>0?resumoRow('Grupos',tGrupsEmp,false,false):''}
+          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid rgba(45,91,227,.15);margin-top:4px;">
+            <span style="color:var(--accent);">Total empresa</span>
+            <span style="font-family:'DM Mono',monospace;color:var(--accent);">${brl(totalEmp)}</span>
+          </div>
+        </div>
+
+        <div style="background:#fdf8f6;border-radius:8px;padding:8px 12px;margin-bottom:8px;">
+          <div style="font-size:11px;font-weight:600;color:#c0533a;margin-bottom:6px;">🏠 PESSOAL</div>
+          ${tPesContas>0?resumoRow('Contas pessoais',tPesContas,false,false):''}
+          ${tPesCart  >0?resumoRow('Cartões pes.',tPesCart,false,false):''}
+          ${tPesEmp   >0?resumoRow('Outros',tPesEmp,false,false):''}
+          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid rgba(192,83,58,.15);margin-top:4px;">
+            <span style="color:#c0533a;">Total pessoal</span>
+            <span style="font-family:'DM Mono',monospace;color:#c0533a;">${brl(totalPes)}</span>
+          </div>
+        </div>
+
+        ${tFuncs>0?`<div style="background:var(--green-bg);border-radius:8px;padding:8px 12px;margin-bottom:8px;">
+          <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px;">👥 FUNCIONÁRIOS</div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
+            <span style="color:var(--green);">${(D.funcionarios||[]).filter(f=>!f.pago).length} pendentes</span>
+            <span style="font-family:'DM Mono',monospace;color:var(--green);">${brl(tFuncs)}</span>
+          </div>
+        </div>`:''}
+
+        <div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;font-size:14px;border-top:2px solid var(--border);margin-top:4px;">
+          <span style="color:var(--red);">TOTAL PENDENTE</span>
+          <span style="font-family:'DM Mono',monospace;color:var(--red);">${brl(totalGeral)}</span>
+        </div>
+      </div>
+
+      <!-- Distribuição -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">📊 Distribuição</div>
+        ${barRow('Boletos',       tEmpBol,  '#ef4444')}
+        ${barRow('Links/Emp.',    tEmpLink, '#f97316')}
+        ${barRow('Cartões emp.',  tEmpCart, '#f59e0b')}
+        ${barRow('Empréstimos',   tEmprest, '#10b981')}
+        ${barRow('Outras contas', tEmpOut,  '#06b6d4')}
+        ${barRow('Grupos emp.',   tGrupsEmp,'#8b5cf6')}
+        ${barRow('Pessoal',       tPesContas,'#ec4899')}
+        ${barRow('Cartões pes.',  tPesCart, '#a855f7')}
+        ${barRow('Outros pes.',   tPesEmp,  '#6366f1')}
+        ${barRow('Funcionários',  tFuncs,   '#2e7d45')}
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--text3);">
+          <span>Total distribuído</span>
+          <span style="font-weight:700;color:var(--text);font-family:'DM Mono',monospace;">${brl(totalGeral)}</span>
+        </div>
+      </div>
+    </div>`;
 }
 
 // ── Empresa ──
