@@ -228,6 +228,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .minha-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px;}
 .minha-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:6px;}
 
+/* ── Receita/Contas cards ── */
+.receita-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px;}
+.receita-title{font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--text3);margin-bottom:12px;}
+.receita-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.receita-row:last-child{border-bottom:none;}
+.receita-label{font-size:13px;color:var(--text2);}
+.receita-input{font-size:13px;font-family:'DM Mono',monospace;font-weight:600;text-align:right;border:none;background:none;outline:none;color:var(--text);width:140px;cursor:pointer;border-bottom:1px dashed var(--border);padding:2px 4px;}
+.receita-input:focus{border-bottom-color:var(--accent);color:var(--accent);}
+.receita-total{display:flex;justify-content:space-between;padding:10px 0 0;font-weight:700;font-size:14px;border-top:2px solid var(--border);margin-top:4px;}
+
 /* ── Toast ── */
 .toast{position:fixed;bottom:24px;right:24px;background:#1a1916;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
@@ -543,9 +553,9 @@ const FUNCIONARIO_EMAILS = [
   { email: "wendersonfaria@gmail.com",  nome: "Wenderson" },
   { email: "donizeterodrigo@gmail.com", nome: "Donizete"  },
   { email: "vncalmeida134@gmail.com",   nome: "Vinicius"  },
+  { email: "deysinhalmeida@gmail.com",  nome: "Deyse"     },
   // { email: "jackson@gmail.com",      nome: "Jackson"   },
   // { email: "felipe@gmail.com",       nome: "Felipe"    },
-  // { email: "deyse@gmail.com",        nome: "Deyse"     },
 ];
 // ═══════════════════════════════════════════════════════════════
 
@@ -669,6 +679,7 @@ const pad = n  => String(n).padStart(2,'0');
 const ds  = (y,m,d) => `${y}-${pad(m)}-${pad(d)}`;
 const brl = v  => 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const genId = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+window.focusInput = id => { const el=gi(id); if(el){el.focus();el.select();} };
 const inRange = (d,s,e) => d>=s && d<=e;
 const initials = n => n.substring(0,2).toUpperCase();
 const fmtDate = s => new Date(s+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
@@ -947,23 +958,75 @@ function renderDash(){
   gi('dash-mes-label').textContent=mesLabel(mesAtivo);
 
   // ── Top stats ──
+  const totalContas=(D.sicredi||0)+(D.santander||0)+(D.dinheiro||0);
   gi('dash-stats').innerHTML=`
     <div class="stat-card">
       <div class="stat-lbl" style="margin-bottom:4px;">Total a pagar</div>
       <div class="stat-val red">${brl(gt)}</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-lbl" style="margin-bottom:4px;">Prev. receita</div>
-      <div class="stat-val">${brl(prev)}</div>
+    <div class="stat-card" style="cursor:pointer;" onclick="focusInput('inp-prev')">
+      <div class="stat-lbl" style="margin-bottom:4px;">Prev. fechamento</div>
+      <input id="inp-prev" class="receita-input" style="width:100%;font-size:18px;font-weight:700;"
+        value="${brl(prev)}"
+        onfocus="this.value='${prev||''}'"
+        onblur="D.prevRec=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.prevRec);save();renderDash();"
+        onkeydown="if(event.key==='Enter')this.blur();">
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="focusInput('inp-rec')">
       <div class="stat-lbl" style="margin-bottom:4px;">Recebido</div>
-      <div class="stat-val green">${brl(rec)}</div>
+      <input id="inp-rec" class="receita-input" style="width:100%;font-size:18px;font-weight:700;color:var(--green);"
+        value="${brl(rec)}"
+        onfocus="this.value='${rec||''}'"
+        onblur="D.recebido=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.recebido);save();renderDash();"
+        onkeydown="if(event.key==='Enter')this.blur();">
     </div>
     <div class="stat-card">
       <div class="stat-lbl" style="margin-bottom:4px;">Saldo</div>
       <div class="stat-val" style="color:${(rec-gt)>=0?'var(--green)':'var(--red)'};">${brl(rec-gt)}</div>
     </div>`;
+
+  // ── Contas bancárias ──
+  const sicredi   = D.sicredi   || 0;
+  const santander = D.santander || 0;
+  const dinheiro  = D.dinheiro  || 0;
+  const totalContas2 = sicredi + santander + dinheiro;
+
+  const contasHtml = `<div class="receita-card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div class="receita-title" style="margin:0;">🏦 SALDO EM CONTA</div>
+      <span style="font-size:12px;color:var(--text3);">clique nos valores para editar</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="background:var(--accent-bg);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px;">SICREDI</div>
+        <input class="receita-input" style="width:100%;font-size:16px;font-weight:700;color:var(--accent);"
+          value="${brl(sicredi)}"
+          onfocus="this.value='${sicredi||''}'"
+          onblur="D.sicredi=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.sicredi);save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+      <div style="background:#fdf8f6;border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;font-weight:600;color:#c0533a;margin-bottom:6px;">SANTANDER</div>
+        <input class="receita-input" style="width:100%;font-size:16px;font-weight:700;color:#c0533a;"
+          value="${brl(santander)}"
+          onfocus="this.value='${santander||''}'"
+          onblur="D.santander=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.santander);save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+      <div style="background:var(--green-bg);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px;">DINHEIRO</div>
+        <input class="receita-input" style="width:100%;font-size:16px;font-weight:700;color:var(--green);"
+          value="${brl(dinheiro)}"
+          onfocus="this.value='${dinheiro||''}'"
+          onblur="D.dinheiro=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.dinheiro);save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;border-top:1px solid var(--border);margin-top:12px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text);">Total disponível</span>
+      <span style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:${totalContas2>0?'var(--green)':'var(--text)'};">${brl(totalContas2)}</span>
+    </div>
+  </div>`;
 
   // ── Vencimentos próximos ──
   const vencs = getVencimentos();
@@ -1031,69 +1094,50 @@ function renderDash(){
     </div>`;
 
   gi('dash-cards').innerHTML = `
+    ${contasHtml}
     ${vencHtml}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="card" style="margin-top:0;">
+      <div class="card-title" style="margin-bottom:12px;">📋 Resumo do mês — pendentes</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
 
-      <!-- Resumo -->
-      <div class="card">
-        <div class="card-title" style="margin-bottom:10px;">📋 Resumo do mês</div>
-
-        <div style="background:var(--accent-bg);border-radius:8px;padding:8px 12px;margin-bottom:8px;">
-          <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px;">🏪 EMPRESA</div>
-          ${tEmpBol  >0?resumoRow('Boletos',tEmpBol,false,false):''}
-          ${tEmpLink >0?resumoRow('Links/Emp.',tEmpLink,false,false):''}
-          ${tEmpCart >0?resumoRow('Cartões emp.',tEmpCart,false,false):''}
-          ${tEmprest >0?resumoRow('Empréstimos',tEmprest,false,false):''}
-          ${tEmpOut  >0?resumoRow('Outras contas',tEmpOut,false,false):''}
-          ${tGrupsEmp>0?resumoRow('Grupos',tGrupsEmp,false,false):''}
-          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid rgba(45,91,227,.15);margin-top:4px;">
+        <!-- Empresa -->
+        <div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--accent-bg);">🏪 EMPRESA</div>
+          ${tEmpBol  >0?resumoRow('Boletos',       tEmpBol,  false,false):''}
+          ${tEmpLink >0?resumoRow('Links/Emp.',     tEmpLink, false,false):''}
+          ${tEmpCart >0?resumoRow('Cartões emp.',   tEmpCart, false,false):''}
+          ${tEmprest >0?resumoRow('Empréstimos',    tEmprest, false,false):''}
+          ${tEmpOut  >0?resumoRow('Outras contas',  tEmpOut,  false,false):''}
+          ${tGrupsEmp>0?resumoRow('Grupos',         tGrupsEmp,false,false):''}
+          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
             <span style="color:var(--accent);">Total empresa</span>
             <span style="font-family:'DM Mono',monospace;color:var(--accent);">${brl(totalEmp)}</span>
           </div>
         </div>
 
-        <div style="background:#fdf8f6;border-radius:8px;padding:8px 12px;margin-bottom:8px;">
-          <div style="font-size:11px;font-weight:600;color:#c0533a;margin-bottom:6px;">🏠 PESSOAL</div>
+        <!-- Pessoal + Funcionários -->
+        <div>
+          <div style="font-size:11px;font-weight:600;color:#c0533a;letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #fdf0ec;">🏠 PESSOAL</div>
           ${tPesContas>0?resumoRow('Contas pessoais',tPesContas,false,false):''}
-          ${tPesCart  >0?resumoRow('Cartões pes.',tPesCart,false,false):''}
-          ${tPesEmp   >0?resumoRow('Outros',tPesEmp,false,false):''}
-          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid rgba(192,83,58,.15);margin-top:4px;">
+          ${tPesCart  >0?resumoRow('Cartões pes.',   tPesCart,  false,false):''}
+          ${tPesEmp   >0?resumoRow('Outros',         tPesEmp,   false,false):''}
+          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
             <span style="color:#c0533a;">Total pessoal</span>
             <span style="font-family:'DM Mono',monospace;color:#c0533a;">${brl(totalPes)}</span>
           </div>
-        </div>
-
-        ${tFuncs>0?`<div style="background:var(--green-bg);border-radius:8px;padding:8px 12px;margin-bottom:8px;">
-          <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:4px;">👥 FUNCIONÁRIOS</div>
-          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
-            <span style="color:var(--green);">${(D.funcionarios||[]).filter(f=>!f.pago).length} pendentes</span>
-            <span style="font-family:'DM Mono',monospace;color:var(--green);">${brl(tFuncs)}</span>
-          </div>
-        </div>`:''}
-
-        <div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;font-size:14px;border-top:2px solid var(--border);margin-top:4px;">
-          <span style="color:var(--red);">TOTAL PENDENTE</span>
-          <span style="font-family:'DM Mono',monospace;color:var(--red);">${brl(totalGeral)}</span>
+          ${tFuncs>0?`
+          <div style="font-size:11px;font-weight:600;color:var(--green);letter-spacing:.06em;margin:14px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--green-bg);">👥 FUNCIONÁRIOS</div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
+            <span style="color:var(--text2);">${(D.funcionarios||[]).filter(f=>!f.pago).length} pendente${(D.funcionarios||[]).filter(f=>!f.pago).length!==1?'s':''}</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--green);">${brl(tFuncs)}</span>
+          </div>`:''}
         </div>
       </div>
 
-      <!-- Distribuição -->
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px;">📊 Distribuição</div>
-        ${barRow('Boletos',       tEmpBol,  '#ef4444')}
-        ${barRow('Links/Emp.',    tEmpLink, '#f97316')}
-        ${barRow('Cartões emp.',  tEmpCart, '#f59e0b')}
-        ${barRow('Empréstimos',   tEmprest, '#10b981')}
-        ${barRow('Outras contas', tEmpOut,  '#06b6d4')}
-        ${barRow('Grupos emp.',   tGrupsEmp,'#8b5cf6')}
-        ${barRow('Pessoal',       tPesContas,'#ec4899')}
-        ${barRow('Cartões pes.',  tPesCart, '#a855f7')}
-        ${barRow('Outros pes.',   tPesEmp,  '#6366f1')}
-        ${barRow('Funcionários',  tFuncs,   '#2e7d45')}
-        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--text3);">
-          <span>Total distribuído</span>
-          <span style="font-weight:700;color:var(--text);font-family:'DM Mono',monospace;">${brl(totalGeral)}</span>
-        </div>
+      <!-- Total geral -->
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 2px;font-weight:700;font-size:15px;border-top:2px solid var(--border);margin-top:14px;">
+        <span style="color:var(--red);">TOTAL PENDENTE</span>
+        <span style="font-family:'DM Mono',monospace;color:var(--red);font-size:18px;">${brl(totalGeral)}</span>
       </div>
     </div>`;
 }
