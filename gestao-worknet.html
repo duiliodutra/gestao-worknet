@@ -632,9 +632,14 @@ window.signInGoogle = async () => {
   try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
   catch(e){ showToast('Erro: '+e.message); }
 };
-window.signInGuest = () => { currentUser=null; userRole='guest'; applyRole(); startApp(); };
+window.signInGuest = async () => {
+  currentUser=null; userRole='guest';
+  try { await appFin.auth().signInAnonymously(); } catch(e) {}
+  applyRole(); startApp();
+};
 window.doSignOut = async () => {
   if(currentUser) await auth.signOut();
+  try { await appFin.auth().signOut(); } catch(e) {}
   currentUser=null; userRole='guest'; uid=null;
   gi('topbar').style.display='none';
   gi('app-layout').style.display='none';
@@ -654,6 +659,15 @@ auth.onAuthStateChanged(async user => {
       const found = FUNCIONARIO_EMAILS.find(f=>f.email.toLowerCase()===email);
       if(found){ userRole='funcionario'; myEmpName=found.nome; }
       else { userRole='guest'; }
+    }
+    // Autenticar no banco antigo com o mesmo token Google
+    try {
+      const idToken = await user.getIdToken();
+      const credential = firebase.auth.GoogleAuthProvider.credential(null, idToken);
+      await appFin.auth().signInWithCredential(credential);
+    } catch(e) {
+      // Se falhar, tenta login anônimo no banco antigo (apenas leitura)
+      try { await appFin.auth().signInAnonymously(); } catch(e2) { console.warn('Auth secundária falhou:', e2); }
     }
     applyRole(); startApp();
   } else {
