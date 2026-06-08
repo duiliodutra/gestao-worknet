@@ -1119,48 +1119,63 @@ function renderDash(){
   gi('dash-cards').innerHTML = `
     ${vencHtml}
     <div class="card" style="margin-top:0;">
-      <div class="card-title" style="margin-bottom:12px;">📋 Resumo do mês — pendentes</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="card-title" style="margin-bottom:12px;">📋 Resumo do mês</div>
 
-        <!-- Empresa -->
-        <div>
-          <div style="font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid var(--accent-bg);">🏪 EMPRESA</div>
-          ${tEmpBol  >0?resumoRow('Boletos',       tEmpBol,  false,false):''}
-          ${tEmpLink >0?resumoRow('Links/Emp.',     tEmpLink, false,false):''}
-          ${tEmpCart >0?resumoRow('Cartões emp.',   tEmpCart, false,false):''}
-          ${tEmprest >0?resumoRow('Empréstimos',    tEmprest, false,false):''}
-          ${tEmpOut  >0?resumoRow('Outras contas',  tEmpOut,  false,false):''}
-          ${tGrupsEmp>0?resumoRow('Grupos emp.',tGrupsEmp,false,false):''}
-          ${(D.gruposEmp||[]).filter(g=>tArrPagar(g.itens)>0).map(g=>resumoRow('  '+(g.nome||g.titulo||'Grupo'),tArrPagar(g.itens),false,false)).join('')}
-          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
-            <span style="color:var(--accent);">Total empresa</span>
-            <span style="font-family:'JetBrains Mono',monospace;color:var(--accent);">${brl(totalEmp)}</span>
-          </div>
-        </div>
-
-        <!-- Pessoal + Funcionários -->
-        <div>
-          <div style="font-size:11px;font-weight:600;color:#c0533a;letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #fdf0ec;">🏠 PESSOAL</div>
-          ${tPesContas>0?resumoRow('Contas pessoais',tPesContas,false,false):''}
-          ${tPesCart  >0?resumoRow('Cartões pes.',   tPesCart,  false,false):''}
-          ${(D.grupos||[]).filter(g=>tArrPagar(g.itens)>0).map(g=>resumoRow(g.nome||g.titulo||'Grupo',tArrPagar(g.itens),false,false)).join('')}
-          <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
-            <span style="color:#c0533a;">Total pessoal</span>
-            <span style="font-family:'JetBrains Mono',monospace;color:#c0533a;">${brl(totalPes)}</span>
-          </div>
-          ${tFuncs>0?`
-          <div style="font-size:11px;font-weight:600;color:var(--green);letter-spacing:.06em;margin:14px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--green-bg);">👥 FUNCIONÁRIOS</div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
-            <span style="color:var(--text2);">${(D.funcionarios||[]).filter(f=>!f.pago).length} pendente${(D.funcionarios||[]).filter(f=>!f.pago).length!==1?'s':''}</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--green);">${brl(tFuncs)}</span>
-          </div>`:''}
-        </div>
+      <!-- Header -->
+      <div style="display:grid;grid-template-columns:1fr 110px 110px;gap:6px;padding:0 0 6px;border-bottom:2px solid var(--border);margin-bottom:4px;">
+        <span style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--text3);">CATEGORIA</span>
+        <span style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--text3);text-align:right;">TOTAL</span>
+        <span style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--red);text-align:right;">PENDENTE</span>
       </div>
 
+      ${(()=>{
+        const tTotal = arr => (arr||[]).reduce((s,x)=>s+(x.val||x.total||0),0);
+        const tTotalGrupo = arr => (arr||[]).filter(x=>!x.tipo||x.tipo==='pagar').reduce((s,x)=>s+(x.val||x.total||0),0);
+        const row = (label, total, pend, isSection) => {
+          if(total===0&&pend===0) return '';
+          return '<div style="display:grid;grid-template-columns:1fr 110px 110px;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);align-items:center;">'
+            +'<span style="font-size:'+(isSection?'12px':'13px')+';font-weight:'+(isSection?'600':'400')+';color:'+(isSection?'var(--text)':'var(--text2)')+';">'+label+'</span>'
+            +'<span style="font-size:12px;font-family:monospace;text-align:right;color:var(--text2);">'+brl(total)+'</span>'
+            +'<span style="font-size:13px;font-family:monospace;font-weight:600;text-align:right;color:'+(pend>0?'var(--red)':'var(--green)')+';">'+brl(pend)+'</span>'
+            +'</div>';
+        };
+        let html='';
+        // Empresa
+        html+='<div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--accent);padding:8px 0 4px;">🏪 EMPRESA</div>';
+        html+=row('Boletos',        tTotal(D.boletos),    tArr(D.boletos));
+        html+=row('Links/Emp.',     tTotal(D.links),      tArr(D.links));
+        html+=row('Cartões emp.',   tTotal(D.cartoes),    tArr(D.cartoes));
+        html+=row('Empréstimos',    tTotal(D.emprestimos),tArr(D.emprestimos));
+        html+=row('Outras contas',  tTotal(D.empresa),    tArr(D.empresa));
+        (D.gruposEmp||[]).forEach(g=>{html+=row(g.nome||g.titulo||'Grupo', tTotalGrupo(g.itens), tArrPagar(g.itens));});
+        html+='<div style="display:grid;grid-template-columns:1fr 110px 110px;gap:6px;padding:6px 0;border-top:1px solid var(--border);margin-top:2px;">'
+          +'<span style="font-size:12px;font-weight:700;color:var(--accent);">Total empresa</span>'
+          +'<span style="font-size:12px;font-family:monospace;text-align:right;color:var(--text2);">'+brl([...D.boletos||[],...D.links||[],...D.cartoes||[],...D.emprestimos||[],...D.empresa||[]].reduce((s,x)=>s+(x.val||0),0)+(D.gruposEmp||[]).reduce((t,g)=>t+tTotalGrupo(g.itens),0))+'</span>'
+          +'<span style="font-size:13px;font-family:monospace;font-weight:700;text-align:right;color:var(--accent);">'+brl(totalEmp)+'</span>'
+          +'</div>';
+        // Pessoal
+        html+='<div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#c0533a;padding:10px 0 4px;">🏠 PESSOAL</div>';
+        html+=row('Contas pessoais',tTotal(D.pessoal),    tArr(D.pessoal));
+        html+=row('Cartões pes.',   tTotal(D.cartoesPes), tArr(D.cartoesPes));
+        (D.grupos||[]).forEach(g=>{html+=row(g.nome||g.titulo||'Grupo', tTotalGrupo(g.itens), tArrPagar(g.itens));});
+        html+='<div style="display:grid;grid-template-columns:1fr 110px 110px;gap:6px;padding:6px 0;border-top:1px solid var(--border);margin-top:2px;">'
+          +'<span style="font-size:12px;font-weight:700;color:#c0533a;">Total pessoal</span>'
+          +'<span style="font-size:12px;font-family:monospace;text-align:right;color:var(--text2);">'+brl([...D.pessoal||[],...D.cartoesPes||[]].reduce((s,x)=>s+(x.val||0),0)+(D.grupos||[]).reduce((t,g)=>t+tTotalGrupo(g.itens),0))+'</span>'
+          +'<span style="font-size:13px;font-family:monospace;font-weight:700;text-align:right;color:#c0533a;">'+brl(totalPes)+'</span>'
+          +'</div>';
+        // Funcionários
+        if(tFuncs>0){
+          html+='<div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--green);padding:10px 0 4px;">👥 FUNCIONÁRIOS</div>';
+          html+=row((D.funcionarios||[]).filter(f=>!f.pago).length+' pendentes', tFunc()+((D.funcionarios||[]).filter(f=>f.pago).reduce((s,f)=>s+calcSal(f).liquido,0)), tFuncs);
+        }
+        return html;
+      })()}
+
       <!-- Total geral -->
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 2px;font-weight:700;font-size:15px;border-top:2px solid var(--border);margin-top:14px;">
-        <span style="color:var(--red);">TOTAL PENDENTE</span>
-        <span style="font-family:'JetBrains Mono',monospace;color:var(--red);font-size:18px;">${brl(totalGeral)}</span>
+      <div style="display:grid;grid-template-columns:1fr 110px 110px;gap:6px;padding:10px 0 2px;border-top:2px solid var(--border);margin-top:6px;">
+        <span style="font-size:14px;font-weight:700;color:var(--red);">TOTAL PENDENTE</span>
+        <span></span>
+        <span style="font-size:16px;font-weight:700;font-family:monospace;text-align:right;color:var(--red);">${brl(totalGeral)}</span>
       </div>
     </div>`;
 }
