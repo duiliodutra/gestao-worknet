@@ -548,7 +548,20 @@ const FUNCIONARIO_EMAILS = [
 
 firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
-const db   = firebase.firestore();
+const db   = firebase.firestore(); // gestao-worknet (escala/férias + novos dados)
+
+// ── Firebase ANTIGO: somente leitura para dados financeiros ──
+const FIREBASE_CONFIG_FIN = {
+  apiKey: "AIzaSyCpoa6aWVB8Ci4lH8A2eATOK5kubdC9cqg",
+  authDomain: "financeiro-pessoal-cd1c0.firebaseapp.com",
+  projectId: "financeiro-pessoal-cd1c0",
+  storageBucket: "financeiro-pessoal-cd1c0.firebasestorage.app",
+  messagingSenderId: "378029746975",
+  appId: "1:378029746975:web:e2e8b823843ae17ac91e2a"
+};
+const appFin = firebase.initializeApp(FIREBASE_CONFIG_FIN, 'financeiro');
+const dbFin  = appFin.firestore(); // somente leitura — nunca escrevemos aqui
+const ADMIN_UID_FIN = "2wTQICxbEaZKwH6WKBgQ32m7lVj1"; // uid do admin no banco antigo
 
 // ── Constantes ──
 const EMPLOYEES = [
@@ -729,20 +742,28 @@ function dadosVazios(){
 
 let saveTimer=null;
 function save(){
-  if(!uid||!mesAtivo) return;
+  if(!uid||!mesAtivo||userRole!=='admin') return;
   clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{
-    db.collection('usuarios').doc(uid).collection('meses').doc(mesAtivo).set(D)
-      .then(()=>showToast('Salvo ✓')).catch(()=>showToast('Erro ao salvar'));
+    // Salva no banco ANTIGO para manter compatibilidade com o sistema financeiro
+    dbFin.collection('usuarios').doc(ADMIN_UID_FIN).collection('meses').doc(mesAtivo).set(D)
+      .then(()=>showToast('Salvo ✓')).catch(e=>{
+        console.error('Erro ao salvar no banco financeiro:', e);
+        showToast('Erro ao salvar');
+      });
   },800);
 }
 
 async function loadFinanceiro(ym){
   if(!uid) return;
   try{
-    const doc = await db.collection('usuarios').doc(uid).collection('meses').doc(ym).get();
+    // Lê do banco ANTIGO usando o uid fixo do admin (somente leitura)
+    const doc = await dbFin.collection('usuarios').doc(ADMIN_UID_FIN).collection('meses').doc(ym).get();
     D = doc.exists ? {...dadosVazios(),...doc.data()} : dadosVazios();
-  }catch(e){ D=dadosVazios(); }
+  }catch(e){
+    console.warn('Erro ao carregar financeiro antigo:', e);
+    D = dadosVazios();
+  }
 }
 
 async function trocarMes(ym){
@@ -777,7 +798,7 @@ async function copiarMesAnterior(){
   const meses=getMeses(); const idx=meses.indexOf(mesAtivo);
   if(idx<=0){alert('Sem mês anterior.');return;}
   const ant=meses[idx-1]; let prev={};
-  try{const doc=await db.collection('usuarios').doc(uid).collection('meses').doc(ant).get();if(doc.exists)prev=doc.data();}catch(e){}
+  try{const doc=await dbFin.collection('usuarios').doc(ADMIN_UID_FIN).collection('meses').doc(ant).get();if(doc.exists)prev=doc.data();}catch(e){}
   if(!prev.boletos&&!prev.funcionarios){alert('Sem dados.');return;}
   const reset=arr=>(arr||[]).map(x=>({...x,pago:false}));
   D.boletos=reset(prev.boletos);D.links=reset(prev.links);D.cartoes=reset(prev.cartoes);
