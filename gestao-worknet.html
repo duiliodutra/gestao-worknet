@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestão Worknet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -21,16 +22,16 @@
   --amber:#8a6c10;--amber-bg:#fffbf0;
   --radius:10px;--radius-lg:14px;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
 
 /* ── Auth ── */
 #auth-screen{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;align-items:center;justify-content:center;}
 .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 44px;width:360px;text-align:center;box-shadow:0 4px 32px rgba(0,0,0,0.08);}
 .auth-logo{font-size:22px;font-weight:700;letter-spacing:-0.03em;margin-bottom:2px;}
-.auth-sub{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:28px;}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 20px;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;color:var(--text);transition:background .15s;margin-bottom:10px;}
+.auth-sub{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:28px;}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 20px;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;color:var(--text);transition:background .15s;margin-bottom:10px;}
 .btn-google:hover{background:var(--surface2);}
-.btn-guest{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border:none;border-radius:10px;background:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:'DM Sans',sans-serif;}
+.btn-guest{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border:none;border-radius:10px;background:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:'Inter',sans-serif;}
 .btn-guest:hover{background:var(--surface2);}
 .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -46,11 +47,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ── Top bar ── */
 .topbar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:50;}
 .topbar-logo{font-size:15px;font-weight:700;letter-spacing:-0.02em;flex:1;}
-.topbar-logo small{font-size:10px;font-weight:400;color:var(--text3);display:block;font-family:'DM Mono',monospace;}
+.topbar-logo small{font-size:10px;font-weight:400;color:var(--text3);display:block;font-family:'JetBrains Mono',monospace;}
 .topbar-user{display:flex;align-items:center;gap:8px;}
 .user-photo{width:28px;height:28px;border-radius:50%;object-fit:cover;}
 .user-photo-placeholder{width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);}
-.topbar-role{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+.topbar-role{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
 .btn-icon{border:none;background:none;cursor:pointer;font-size:18px;color:var(--text3);padding:4px;border-radius:6px;display:flex;align-items:center;}
 .btn-icon:hover{background:var(--surface2);color:var(--text2);}
 .btn-menu-top{border:none;background:none;cursor:pointer;font-size:22px;color:var(--text2);display:flex;align-items:center;padding:4px;}
@@ -73,12 +74,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 }
 .nav-section{padding:12px 10px 6px;}
 .nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text3);padding:0 8px;margin-bottom:3px;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;background:none;cursor:pointer;width:100%;text-align:left;font-size:13px;color:var(--text2);font-family:'DM Sans',sans-serif;transition:background .12s,color .12s;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;background:none;cursor:pointer;width:100%;text-align:left;font-size:13px;color:var(--text2);font-family:'Inter',sans-serif;transition:background .12s,color .12s;}
 .nav-item:hover{background:var(--surface2);color:var(--text);}
 .nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500;}
 .nav-item i{font-size:16px;flex-shrink:0;}
 .nav-divider{height:1px;background:var(--border);margin:8px 0;}
-.emp-nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:none;background:none;cursor:pointer;width:100%;text-align:left;font-size:12.5px;color:var(--text2);font-family:'DM Sans',sans-serif;transition:background .12s;}
+.emp-nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:none;background:none;cursor:pointer;width:100%;text-align:left;font-size:12.5px;color:var(--text2);font-family:'Inter',sans-serif;transition:background .12s;}
 .emp-nav-item:hover{background:var(--surface2);}
 .emp-nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
@@ -98,7 +99,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 @media(max-width:600px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;}
-.stat-val{font-size:20px;font-weight:700;letter-spacing:-.03em;font-family:'DM Mono',monospace;}
+.stat-val{font-size:20px;font-weight:700;letter-spacing:-.03em;font-family:'JetBrains Mono',monospace;}
 .stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
 
 /* ── Table ── */
@@ -131,7 +132,7 @@ tr:hover .row-actions{opacity:1;}
 .red{color:var(--red);}
 
 /* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;transition:background .12s;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:500;transition:background .12s;}
 .btn-primary{background:var(--accent);color:#fff;}
 .btn-primary:hover{background:#1e47c9;}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
@@ -139,13 +140,13 @@ tr:hover .row-actions{opacity:1;}
 .btn-danger{background:#fee2e2;color:#991b1b;}
 .btn-danger:hover{background:#fecaca;}
 .btn-sm{padding:4px 10px;font-size:12px;}
-.add-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:none;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text2);transition:background .12s;}
+.add-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--border);border-radius:7px;background:none;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;color:var(--text2);transition:background .12s;}
 .add-btn:hover{background:var(--surface2);}
 
 /* ── Mes bar ── */
 .mes-bar-wrap{display:flex;align-items:center;gap:8px;padding:8px 20px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;}
 .mes-bar{display:flex;gap:4px;flex-shrink:0;}
-.mes-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12px;color:var(--text2);white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.mes-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12px;color:var(--text2);white-space:nowrap;font-family:'Inter',sans-serif;}
 .mes-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
 .mes-btn:hover:not(.active){background:var(--surface2);}
 .btn-mes-action{border:1px solid var(--border);background:none;padding:4px 10px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--text2);white-space:nowrap;}
@@ -159,13 +160,13 @@ tr:hover .row-actions{opacity:1;}
 .modal-title{font-size:15px;font-weight:600;margin-bottom:16px;}
 .field-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text3);margin-bottom:4px;display:block;}
 .field-wrap{margin-bottom:12px;}
-input[type=text],input[type=number],input[type=date],input[type=email],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none;}
+input[type=text],input[type=number],input[type=date],input[type=email],select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);outline:none;}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
 
 /* ── Calendar ── */
 .cal-subtabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);flex-shrink:0;}
-.cal-subtab{flex:1;padding:11px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:'DM Sans',sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,background .15s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.cal-subtab{flex:1;padding:11px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text2);font-family:'Inter',sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,background .15s;display:flex;align-items:center;justify-content:center;gap:7px;}
 .cal-subtab:hover{background:var(--surface2);}
 .cal-subtab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;background:var(--accent-bg);}
 .cal-subtab i{font-size:16px;}
@@ -183,7 +184,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .cal-day.today{background:#f0f4fe;}
 .cal-day.weekend-day{background:#fdf8f6;}
 .cal-day.holiday-day{background:#fffbf0;}
-.day-num{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:3px;font-family:'DM Mono',monospace;}
+.day-num{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:3px;font-family:'JetBrains Mono',monospace;}
 .cal-day.today .day-num{color:var(--accent);font-weight:700;}
 .cal-day.other-month .day-num{color:var(--text3);}
 .cal-day.weekend-day .day-num{color:#c0533a;}
@@ -197,19 +198,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .escala-stats{display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;font-size:12px;}
 .pl-stat-item{display:flex;align-items:center;gap:6px;}
 .pl-stat-dot{width:8px;height:8px;border-radius:50%;}
-.pl-stat-badge{font-size:11px;padding:1px 7px;border-radius:10px;font-weight:700;font-family:'DM Mono',monospace;}
+.pl-stat-badge{font-size:11px;padding:1px 7px;border-radius:10px;font-weight:700;font-family:'JetBrains Mono',monospace;}
 
 /* ── Plantão panel ── */
 .plantao-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:12px;}
-.pl-date{width:120px;font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;flex-shrink:0;}
+.pl-date{width:120px;font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace;flex-shrink:0;}
 .pl-type{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;flex-shrink:0;}
 .pl-chips{display:flex;gap:4px;flex:1;flex-wrap:wrap;}
 .pl-chip-item{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;background:#fee2e2;color:#991b1b;cursor:pointer;}
-.pl-add-btn{border:1px dashed var(--border);background:none;padding:4px 10px;border-radius:7px;font-size:11px;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.pl-add-btn{border:1px dashed var(--border);background:none;padding:4px 10px;border-radius:7px;font-size:11px;cursor:pointer;color:var(--text2);font-family:'Inter',sans-serif;display:flex;align-items:center;gap:4px;flex-shrink:0;}
 .pl-add-btn:hover{background:var(--surface2);}
 
 /* ── Férias panel ── */
-.period-chip-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;}
+.period-chip-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;color:var(--text2);font-family:'Inter',sans-serif;}
 .period-chip-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;}
 .emp-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;}
 .emp-block-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;}
@@ -218,7 +219,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .emp-block-body{padding:12px 16px 14px;}
 .period-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
 .period-row:last-child{border-bottom:none;}
-.period-year-badge{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.period-year-badge{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;font-family:'JetBrains Mono',monospace;white-space:nowrap;flex-shrink:0;margin-top:2px;}
 .period-parcelas{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;}
 .parcela-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:6px;font-weight:500;cursor:pointer;}
 .prog-bar{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:5px;}
@@ -234,7 +235,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 .receita-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
 .receita-row:last-child{border-bottom:none;}
 .receita-label{font-size:13px;color:var(--text2);}
-.receita-input{font-size:13px;font-family:'DM Mono',monospace;font-weight:600;text-align:right;border:none;background:none;outline:none;color:var(--text);width:140px;cursor:pointer;border-bottom:1px dashed var(--border);padding:2px 4px;}
+.receita-input{font-size:13px;font-family:'JetBrains Mono',monospace;font-weight:600;text-align:right;border:none;background:none;outline:none;color:var(--text);width:140px;cursor:pointer;border-bottom:1px dashed var(--border);padding:2px 4px;}
 .receita-input:focus{border-bottom-color:var(--accent);color:var(--accent);}
 .receita-total{display:flex;justify-content:space-between;padding:10px 0 0;font-weight:700;font-size:14px;border-top:2px solid var(--border);margin-top:4px;}
 
@@ -244,7 +245,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);}
 
 /* ── Emp tab strip ── */
 .emp-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px;}
-.emp-tab{padding:5px 13px;font-size:12px;border:1px solid var(--border);border-radius:20px;background:none;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;}
+.emp-tab{padding:5px 13px;font-size:12px;border:1px solid var(--border);border-radius:20px;background:none;cursor:pointer;color:var(--text2);font-family:'Inter',sans-serif;}
 .emp-tab.active{background:var(--text);border-color:var(--text);color:#fff;font-weight:600;}
 
 ::-webkit-scrollbar{width:5px;height:5px;}
@@ -288,7 +289,7 @@ body.readonly [data-admin]{display:none!important;}
 
 <div class="readonly-banner" id="readonly-banner">
   <i class="ti ti-eye"></i> Modo visualização — dados somente leitura.
-  <button onclick="showAuth()" style="margin-left:auto;border:1px solid #d4a800;background:#fffbf0;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;color:#8a6c10;">Entrar</button>
+  <button onclick="showAuth()" style="margin-left:auto;border:1px solid #d4a800;background:#fffbf0;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;color:#8a6c10;">Entrar</button>
 </div>
 
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -324,8 +325,8 @@ body.readonly [data-admin]{display:none!important;}
     <!-- ══ DASHBOARD ══ -->
     <div id="page-dashboard" class="page" style="display:none;">
       <div class="page-header"><span class="page-title">📊 Painel</span>
-        <span id="dash-mes-label" style="font-size:13px;color:var(--text3);font-family:'DM Mono',monospace;"></span>
-        <button id="btn-migrar" onclick="migrarDados()" style="display:none;padding:6px 14px;border:1px solid #d4a800;background:#fffbf0;border-radius:8px;font-size:12px;cursor:pointer;color:#8a6c10;font-family:'DM Sans',sans-serif;">
+        <span id="dash-mes-label" style="font-size:13px;color:var(--text3);font-family:'JetBrains Mono',monospace;"></span>
+        <button id="btn-migrar" onclick="migrarDados()" style="display:none;padding:6px 14px;border:1px solid #d4a800;background:#fffbf0;border-radius:8px;font-size:12px;cursor:pointer;color:#8a6c10;font-family:'Inter',sans-serif;">
           📦 Importar dados do sistema antigo
         </button>
       </div>
@@ -849,6 +850,8 @@ async function trocarMes(ym){
   if(uid) save();
   mesAtivo=ym;
   await loadFinanceiro(ym);
+  // Re-render all mes bars to sync active state
+  ['mes-bar','mes-bar-emp','mes-bar-func','mes-bar-pes','mes-bar-minha'].forEach(id=>renderMesBar(id));
   renderAll();
 }
 
@@ -862,6 +865,8 @@ function mesLabel(ym){const[y,m]=ym.split('-');return MESES[parseInt(m)-1]+' '+y
 function renderMesBar(id){
   const el=gi(id); if(!el) return;
   el.innerHTML=getMeses().map(ym=>`<button class="mes-btn ${ym===mesAtivo?'active':''}" onclick="trocarMes('${ym}')">${mesLabel(ym)}</button>`).join('');
+  // Scroll active button into view
+  setTimeout(()=>{const active=el.querySelector('.mes-btn.active');if(active)active.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});},50);
 }
 
 async function adicionarMes(){
@@ -908,9 +913,8 @@ function tArr(arr){return(arr||[]).filter(x=>!x.pago).reduce((s,x)=>s+(x.val||x.
 function GT(){
   return tArr(D.boletos)+tArr(D.links)+tArr(D.cartoes)+tArr(D.emprestimos)+tArr(D.empresa)+
     tFunc()+tArr(D.pessoal)+tArr(D.cartoesPes)+
-    tArr(D.mae?.pago)+tArr(D.luana?.pago)+tArr(D.deyse?.pago)+
-    (D.gruposEmp||[]).reduce((t,g)=>t+tArr((g.itens||[]).filter(x=>x.tipo==='pagar'))-tArr((g.itens||[]).filter(x=>x.tipo==='receber')),0)+
-    (D.grupos||[]).reduce((t,g)=>t+tArr((g.itens||[]).filter(x=>x.tipo==='pagar'))-tArr((g.itens||[]).filter(x=>x.tipo==='receber')),0);
+    (D.gruposEmp||[]).reduce((t,g)=>t+tArr(g.itens||[]),0)+
+    (D.grupos||[]).reduce((t,g)=>t+tArr(g.itens||[]),0);
 }
 
 function vencBadge(venc,pago){
@@ -941,8 +945,8 @@ function getVencimentos(){
   add('Empresa',      D.empresa);
   add('Pessoal',      D.pessoal);
   add('Cartão pes.',  D.cartoesPes);
-  (D.gruposEmp||[]).forEach(g => add(g.titulo||'Empresa', (g.itens||[]).filter(x=>x.tipo==='pagar')));
-  (D.grupos||[]).forEach(g => add(g.titulo||'Pessoal', (g.itens||[]).filter(x=>x.tipo==='pagar')));
+  (D.gruposEmp||[]).forEach(g => add(g.titulo||'Empresa', g.itens||[]));
+  (D.grupos||[]).forEach(g => add(g.titulo||'Pessoal', g.itens||[]));
   return items.sort((a,b) => a.diff - b.diff);
 }
 
@@ -1034,7 +1038,7 @@ function renderDash(){
       return `<div style="display:grid;grid-template-columns:100px 1fr auto auto;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
         <span style="font-size:11px;color:var(--text3);">${v.cat}</span>
         <span style="font-size:13px;font-weight:500;">${v.desc}</span>
-        <span style="font-size:13px;font-family:'DM Mono',monospace;font-weight:600;">${brl(v.val)}</span>
+        <span style="font-size:13px;font-family:'JetBrains Mono',monospace;font-weight:600;">${brl(v.val)}</span>
         <span class="venc-badge ${s.cls}">${s.label}</span>
       </div>`;
     }).join('');
@@ -1075,7 +1079,7 @@ function renderDash(){
       <div style="flex:1;background:var(--surface2);border-radius:3px;height:6px;overflow:hidden;">
         <div style="width:${pct}%;background:${color};height:100%;border-radius:3px;transition:width .4s;"></div>
       </div>
-      <span style="font-size:12px;font-family:'DM Mono',monospace;font-weight:600;min-width:90px;text-align:right;">${brl(val)}</span>
+      <span style="font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:600;min-width:90px;text-align:right;">${brl(val)}</span>
     </div>`:'';
   };
 
@@ -1087,7 +1091,7 @@ function renderDash(){
         ${isGroup?'<strong>':''}${label}${isGroup?'</strong>':''}
       </span>
       <span style="font-size:${isTotal?'14px':'13px'};font-weight:${isTotal||isGroup?700:500};
-        color:${isTotal?'var(--red)':'var(--text)'};font-family:'DM Mono',monospace;">${brl(val)}</span>
+        color:${isTotal?'var(--red)':'var(--text)'};font-family:'JetBrains Mono',monospace;">${brl(val)}</span>
     </div>`;
 
   gi('dash-cards').innerHTML = `
@@ -1104,10 +1108,11 @@ function renderDash(){
           ${tEmpCart >0?resumoRow('Cartões emp.',   tEmpCart, false,false):''}
           ${tEmprest >0?resumoRow('Empréstimos',    tEmprest, false,false):''}
           ${tEmpOut  >0?resumoRow('Outras contas',  tEmpOut,  false,false):''}
-          ${tGrupsEmp>0?resumoRow('Grupos',         tGrupsEmp,false,false):''}
+          ${tGrupsEmp>0?resumoRow('Grupos emp.',tGrupsEmp,false,false):''}
+          ${(D.gruposEmp||[]).filter(g=>tArr(g.itens||[])>0).map(g=>resumoRow('  '+g.titulo,tArr(g.itens||[]),false,false)).join('')}
           <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
             <span style="color:var(--accent);">Total empresa</span>
-            <span style="font-family:'DM Mono',monospace;color:var(--accent);">${brl(totalEmp)}</span>
+            <span style="font-family:'JetBrains Mono',monospace;color:var(--accent);">${brl(totalEmp)}</span>
           </div>
         </div>
 
@@ -1116,16 +1121,16 @@ function renderDash(){
           <div style="font-size:11px;font-weight:600;color:#c0533a;letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #fdf0ec;">🏠 PESSOAL</div>
           ${tPesContas>0?resumoRow('Contas pessoais',tPesContas,false,false):''}
           ${tPesCart  >0?resumoRow('Cartões pes.',   tPesCart,  false,false):''}
-          ${tPesEmp   >0?resumoRow('Outros',         tPesEmp,   false,false):''}
+          ${(D.grupos||[]).filter(g=>tArr(g.itens||[])>0).map(g=>resumoRow(g.titulo,tArr(g.itens||[]),false,false)).join('')}
           <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
             <span style="color:#c0533a;">Total pessoal</span>
-            <span style="font-family:'DM Mono',monospace;color:#c0533a;">${brl(totalPes)}</span>
+            <span style="font-family:'JetBrains Mono',monospace;color:#c0533a;">${brl(totalPes)}</span>
           </div>
           ${tFuncs>0?`
           <div style="font-size:11px;font-weight:600;color:var(--green);letter-spacing:.06em;margin:14px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--green-bg);">👥 FUNCIONÁRIOS</div>
           <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
             <span style="color:var(--text2);">${(D.funcionarios||[]).filter(f=>!f.pago).length} pendente${(D.funcionarios||[]).filter(f=>!f.pago).length!==1?'s':''}</span>
-            <span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--green);">${brl(tFuncs)}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--green);">${brl(tFuncs)}</span>
           </div>`:''}
         </div>
       </div>
@@ -1133,31 +1138,21 @@ function renderDash(){
       <!-- Total geral -->
       <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 2px;font-weight:700;font-size:15px;border-top:2px solid var(--border);margin-top:14px;">
         <span style="color:var(--red);">TOTAL PENDENTE</span>
-        <span style="font-family:'DM Mono',monospace;color:var(--red);font-size:18px;">${brl(totalGeral)}</span>
+        <span style="font-family:'JetBrains Mono',monospace;color:var(--red);font-size:18px;">${brl(totalGeral)}</span>
       </div>
     </div>`;
 }
 
 // ── Empresa ──
-function renderEmpresa(){
-  const body=gi('empresa-body'); if(!body) return;
-  const sections=[
-    {key:'boletos',label:'📄 Boletos',fields:['desc','val','venc','forma']},
-    {key:'links',label:'🔗 Empréstimos/Links',fields:['desc','val','venc','forma']},
-    {key:'cartoes',label:'💳 Cartões',fields:['desc','val','venc','forma']},
-    {key:'emprestimos',label:'🏦 Outros empréstimos',fields:['desc','val','venc','forma']},
-    {key:'empresa',label:'🏪 Outras contas',fields:['desc','val','venc','forma']},
-  ];
-  body.innerHTML=sections.map(s=>renderListSection(s)).join('');
-}
-
-function renderListSection(s){
+// ── Render section (blocos fixos) ──
+function renderListSection(s, onRender){
   const arr=D[s.key]||[];
+  const titulo = (D.titulosBlocos&&D.titulosBlocos[s.key]) || s.label;
   const rows=arr.map((it,i)=>`<tr>
     <td><input type="checkbox" ${it.pago?'checked':''} onchange="D['${s.key}'][${i}].pago=this.checked;save();renderCurrent()"></td>
-    <td>${it.desc||'—'}</td>
-    <td style="font-family:'DM Mono',monospace;">${brl(it.val)}</td>
-    <td>${it.venc?fmtDate(it.venc):'—'}</td>
+    <td style="font-size:13px;">${it.desc||'—'}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:13px;">${brl(it.val)}</td>
+    <td style="font-size:12px;color:var(--text2);">${it.venc?fmtDate(it.venc):'—'}</td>
     <td>${vencBadge(it.venc,it.pago)}</td>
     <td><div class="row-actions">
       <button class="action-btn" onclick="editItem('${s.key}',${i})">✏️</button>
@@ -1165,13 +1160,119 @@ function renderListSection(s){
     </div></td>
   </tr>`).join('');
   const total=tArr(arr);
-  return`<div class="card">
-    <div class="card-title">${s.label} <button class="add-btn btn-sm" onclick="newItem('${s.key}')">＋ Adicionar</button></div>
-    ${arr.length?`<table><thead><tr><th></th><th>Descrição</th><th>Valor</th><th>Venc.</th><th>Status</th><th></th></tr></thead>
-    <tbody>${rows}</tbody><tfoot><tr style="font-weight:700;"><td colspan="2">Total pendente</td><td style="font-family:'DM Mono',monospace;">${brl(total)}</td><td colspan="3"></td></tr></tfoot></table>`
-    :'<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px;">Nenhum item.</div>'}
+  return`<div class="card" style="margin-bottom:12px;">
+    <div class="card-title">
+      <span style="display:flex;align-items:center;gap:6px;">
+        <span contenteditable="true" spellcheck="false"
+          style="outline:none;border-bottom:1px dashed transparent;padding:1px 3px;border-radius:3px;cursor:text;"
+          onmouseover="this.style.borderBottomColor='var(--border)'"
+          onmouseout="this.style.borderBottomColor='transparent'"
+          onblur="if(!D.titulosBlocos)D.titulosBlocos={};D.titulosBlocos['${s.key}']=this.innerText.trim()||'${s.label}';save();"
+          title="Clique para editar o título">${titulo}</span>
+        <span style="font-size:10px;color:var(--text3);" title="Editar título">✏️</span>
+      </span>
+      <button class="add-btn btn-sm" onclick="newItem('${s.key}')">＋ Adicionar</button>
+    </div>
+    ${arr.length?`<table><thead><tr><th style="width:32px;"></th><th>Descrição</th><th>Valor</th><th>Venc.</th><th>Status</th><th style="width:60px;"></th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="2" style="font-weight:700;padding:8px 10px;">Total pendente</td>
+    <td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding:8px 10px;">${brl(total)}</td>
+    <td colspan="3"></td></tr></tfoot></table>`
+    :'<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px;">Nenhum item. <button class="add-btn" onclick="newItem(''+s.key+'')">＋ Adicionar</button></div>'}
   </div>`;
 }
+
+// ── Render bloco personalizado ──
+function renderBlocoCustom(grupo, gi_idx, tipoBloco){
+  const itens=grupo.itens||[];
+  const titulo=grupo.titulo||'Novo bloco';
+  const rows=itens.map((it,i)=>`<tr>
+    <td><input type="checkbox" ${it.pago?'checked':''} onchange="D['${tipoBloco}'][${gi_idx}].itens[${i}].pago=this.checked;save();renderCurrent()"></td>
+    <td style="font-size:13px;">${it.desc||'—'}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:13px;">${brl(it.val)}</td>
+    <td style="font-size:12px;color:var(--text2);">${it.venc?fmtDate(it.venc):'—'}</td>
+    <td>${vencBadge(it.venc,it.pago)}</td>
+    <td><div class="row-actions">
+      <button class="action-btn" onclick="editBlocoItem('${tipoBloco}',${gi_idx},${i})">✏️</button>
+      <button class="action-btn" onclick="D['${tipoBloco}'][${gi_idx}].itens.splice(${i},1);save();renderCurrent()">🗑️</button>
+    </div></td>
+  </tr>`).join('');
+  const total=tArr(itens);
+  return`<div class="card" style="margin-bottom:12px;border-left:3px solid var(--accent);">
+    <div class="card-title">
+      <span style="display:flex;align-items:center;gap:6px;">
+        <span contenteditable="true" spellcheck="false"
+          style="outline:none;border-bottom:1px dashed transparent;padding:1px 3px;border-radius:3px;cursor:text;"
+          onmouseover="this.style.borderBottomColor='var(--border)'"
+          onmouseout="this.style.borderBottomColor='transparent'"
+          onblur="D['${tipoBloco}'][${gi_idx}].titulo=this.innerText.trim()||'Novo bloco';save();renderCurrent();"
+          title="Clique para editar o título">${titulo}</span>
+        <span style="font-size:10px;color:var(--text3);" title="Editar título">✏️</span>
+      </span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="add-btn btn-sm" onclick="newBlocoItem('${tipoBloco}',${gi_idx})">＋ Item</button>
+        <button class="action-btn btn-danger" onclick="if(confirm('Remover bloco?')){D['${tipoBloco}'].splice(${gi_idx},1);save();renderCurrent();}" title="Remover bloco" style="color:var(--red);">🗑️</button>
+      </div>
+    </div>
+    ${itens.length?`<table><thead><tr><th style="width:32px;"></th><th>Descrição</th><th>Valor</th><th>Venc.</th><th>Status</th><th style="width:60px;"></th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td colspan="2" style="font-weight:700;padding:8px 10px;">Total pendente</td>
+    <td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding:8px 10px;">${brl(total)}</td>
+    <td colspan="3"></td></tr></tfoot></table>`
+    :'<div style="text-align:center;padding:1rem;color:var(--text3);font-size:13px;">Nenhum item. <button class="add-btn" onclick="newBlocoItem(''+tipoBloco+'','+gi_idx+')">＋ Adicionar</button></div>'}
+  </div>`;
+}
+
+function renderEmpresa(){
+  const body=gi('empresa-body'); if(!body) return;
+  const sections=[
+    {key:'boletos',   label:'📄 Boletos'},
+    {key:'links',     label:'🔗 Empréstimos/Links'},
+    {key:'cartoes',   label:'💳 Cartões empresa'},
+    {key:'emprestimos',label:'🏦 Outros empréstimos'},
+    {key:'empresa',   label:'🏪 Outras contas'},
+  ];
+  let html = sections.map(s=>renderListSection(s)).join('');
+  // Blocos personalizados de empresa
+  (D.gruposEmp||[]).forEach((g,i)=>{ html+=renderBlocoCustom(g,i,'gruposEmp'); });
+  html+=`<div style="margin-top:4px;">
+    <button class="btn btn-secondary" onclick="addBloco('gruposEmp')">
+      <i class="ti ti-plus"></i> Adicionar bloco personalizado
+    </button>
+  </div>`;
+  body.innerHTML=html;
+}
+
+function renderPessoal(){
+  const body=gi('pessoal-body'); if(!body) return;
+  const sections=[
+    {key:'pessoal',   label:'🏠 Contas pessoais'},
+    {key:'cartoesPes',label:'💳 Cartões pessoais'},
+  ];
+  let html = sections.map(s=>renderListSection(s)).join('');
+  // Blocos personalizados de pessoal
+  (D.grupos||[]).forEach((g,i)=>{ html+=renderBlocoCustom(g,i,'grupos'); });
+  html+=`<div style="margin-top:4px;">
+    <button class="btn btn-secondary" onclick="addBloco('grupos')">
+      <i class="ti ti-plus"></i> Adicionar bloco personalizado
+    </button>
+  </div>`;
+  body.innerHTML=html;
+}
+
+// ── Bloco custom actions ──
+window.addBloco = tipo => {
+  if(!D[tipo]) D[tipo]=[];
+  D[tipo].push({id:genId(), titulo:'Novo bloco', itens:[]});
+  save(); renderCurrent();
+};
+
+
+window.newBlocoItem=(tipo,gi)=>{ blocoCTX={tipo,gi,ii:-1}; gi2('item-modal-title').textContent='Novo item'; gi2('item-modal-body').innerHTML=itemForm({}); openModal('item'); };
+window.editBlocoItem=(tipo,gi,ii)=>{ blocoCTX={tipo,gi,ii}; const it=(D[tipo][gi].itens||[])[ii]||{}; gi2('item-modal-title').textContent='Editar item'; gi2('item-modal-body').innerHTML=itemForm(it); openModal('item'); };
+
+// helper aliases para evitar conflito de nome com a função gi()
+function gi2(id){return document.getElementById(id);}
 
 // ── Funcionários (admin) ──
 function renderFuncionariosPage(){
@@ -1188,68 +1289,156 @@ function renderFuncionariosPage(){
   const d=f.decimo||{valorTotal:0,itens:[]};
   const totalLanc=(d.itens||[]).reduce((s,x)=>s+(x.val||0),0);
 
+  // mini stats do funcionário
+  const miniStats = [
+    {lbl:'Salário bruto',  val:brl(sal.bruto),   color:'var(--text)'},
+    {lbl:'Descontos',      val:'-'+brl((f.descontos||[]).reduce((s,d)=>s+d.val,0)), color:'var(--red)'},
+    {lbl:'Salário líquido',val:brl(sal.liquido),  color:'var(--green)'},
+    {lbl:'Status',         val:f.pago?'✅ Pago':'⏳ Pendente', color:f.pago?'var(--green)':'var(--amber)'},
+  ];
+
   gi('emp-detail').innerHTML=`
-  <div class="grid2">
+  <!-- Mini stats -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+    ${miniStats.map(s=>`<div class="stat-card" style="padding:10px 14px;">
+      <div class="stat-lbl">${s.lbl}</div>
+      <div style="font-size:16px;font-weight:700;color:${s.color};font-family:'JetBrains Mono',monospace;margin-top:4px;">${s.val}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Salário + Descontos lado a lado -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+
+    <!-- Vencimentos -->
     <div class="card">
-      <div class="card-title">
+      <div class="card-title" style="margin-bottom:10px;">
         <span style="display:flex;align-items:center;gap:8px;">
-          <span style="width:10px;height:10px;border-radius:50%;background:${c.mid};display:inline-block;"></span>${f.nome}
+          <span style="width:9px;height:9px;border-radius:50%;background:${c.mid};display:inline-block;"></span>
+          <strong>${f.nome}</strong>
         </span>
-        <div style="display:flex;gap:6px;">
-          <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
-            <input type="checkbox" ${f.pago?'checked':''} onchange="D.funcionarios[${fi}].pago=this.checked;save();renderFuncionariosPage();"> Pago
+        <div style="display:flex;align-items:center;gap:8px;">
+          <label style="font-size:12px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:${f.pago?'var(--green-bg)':'var(--surface2)'};">
+            <input type="checkbox" ${f.pago?'checked':''} onchange="D.funcionarios[${fi}].pago=this.checked;save();renderFuncionariosPage();">
+            <span style="color:${f.pago?'var(--green)':'var(--text2)'};">${f.pago?'Pago':'Marcar pago'}</span>
           </label>
-          <button class="add-btn" onclick="openFuncModal(${fi})">✏️</button>
-          <button class="add-btn btn-danger" onclick="if(confirm('Remover?')){D.funcionarios.splice(${fi},1);D.activeFunc=0;save();renderFuncionariosPage();}">🗑️</button>
+          <button class="action-btn" onclick="openFuncModal(${fi})" title="Editar">✏️</button>
+          <button class="action-btn" onclick="if(confirm('Remover ${f.nome}?')){D.funcionarios.splice(${fi},1);D.activeFunc=0;save();renderFuncionariosPage();}" title="Remover" style="color:var(--red);">🗑️</button>
         </div>
       </div>
-      <div class="sal-row"><span>Salário base</span><span>${brl(f.salarioBase)}</span></div>
-      ${(f.adicionais||[]).map((a,j)=>`<div class="sal-row"><span>${a.desc}</span><span class="green">+${brl(a.val)}</span>
-        <div class="row-actions" style="opacity:1;"><button class="action-btn" onclick="editAdicional(${fi},${j})">✏️</button>
-        <button class="action-btn" onclick="D.funcionarios[${fi}].adicionais.splice(${j},1);save();renderFuncionariosPage()">🗑️</button></div></div>`).join('')}
-      <div class="sal-total"><span>Bruto</span><span class="green">${brl(sal.bruto)}</span></div>
-      <button class="add-btn" style="margin-top:8px;" onclick="editAdicional(${fi},-1)">＋ Adicionar vencimento</button>
+
+      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--text2);">Salário base</span>
+        <span style="font-weight:500;font-family:'JetBrains Mono',monospace;">${brl(f.salarioBase)}</span>
+      </div>
+      ${(f.adicionais||[]).map((a,j)=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--text2);">${a.desc}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:var(--green);font-weight:600;font-family:'JetBrains Mono',monospace;">+${brl(a.val)}</span>
+          <div class="row-actions" style="opacity:1;gap:2px;">
+            <button class="action-btn" onclick="editAdicional(${fi},${j})">✏️</button>
+            <button class="action-btn" onclick="D.funcionarios[${fi}].adicionais.splice(${j},1);save();renderFuncionariosPage()">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('')}
+
+      <div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-size:14px;font-weight:700;border-top:2px solid var(--border);margin-top:4px;">
+        <span>Bruto</span>
+        <span style="color:var(--green);font-family:'JetBrains Mono',monospace;">${brl(sal.bruto)}</span>
+      </div>
+      <button class="add-btn" style="margin-top:10px;" onclick="editAdicional(${fi},-1)">＋ Adicionar vencimento</button>
     </div>
+
+    <!-- Descontos -->
     <div class="card">
-      <div class="card-title">Descontos <button class="add-btn" onclick="editDesconto(${fi},-1)">＋</button></div>
-      ${(f.descontos||[]).map((dc,j)=>`<div class="sal-row"><span>${dc.desc}</span><span class="red">-${brl(dc.val)}</span>
-        <div class="row-actions" style="opacity:1;"><button class="action-btn" onclick="editDesconto(${fi},${j})">✏️</button>
-        <button class="action-btn" onclick="D.funcionarios[${fi}].descontos.splice(${j},1);save();renderFuncionariosPage()">🗑️</button></div></div>`).join('')}
-      <div class="sal-total"><span>Líquido</span><span class="green">${brl(sal.liquido)}</span></div>
+      <div class="card-title" style="margin-bottom:10px;">
+        <span>Descontos</span>
+        <button class="add-btn" onclick="editDesconto(${fi},-1)">＋ Adicionar</button>
+      </div>
+      ${(f.descontos||[]).length===0?`<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Nenhum desconto.</div>`:''}
+      ${(f.descontos||[]).map((dc,j)=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--text2);">${dc.desc}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:var(--red);font-weight:600;font-family:'JetBrains Mono',monospace;">-${brl(dc.val)}</span>
+          <div class="row-actions" style="opacity:1;gap:2px;">
+            <button class="action-btn" onclick="editDesconto(${fi},${j})">✏️</button>
+            <button class="action-btn" onclick="D.funcionarios[${fi}].descontos.splice(${j},1);save();renderFuncionariosPage()">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-size:14px;font-weight:700;border-top:2px solid var(--border);margin-top:4px;">
+        <span>Líquido</span>
+        <span style="color:var(--green);font-family:'JetBrains Mono',monospace;">${brl(sal.liquido)}</span>
+      </div>
     </div>
   </div>
-  <div class="card" style="margin-top:12px;">
-    <div class="card-title">📋 Décimo Terceiro <button class="add-btn" onclick="editDecimo(${fi},-1)">＋</button></div>
-    <div class="field-wrap" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <label class="field-label" style="margin:0;">Valor total:</label>
-      <input type="number" value="${d.valorTotal||''}" step="0.01" placeholder="0,00" style="width:140px;"
-        onchange="D.funcionarios[${fi}].decimo.valorTotal=parseFloat(this.value)||0;save();">
+
+  <!-- Décimo Terceiro + Férias lado a lado -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+    <!-- 13º -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">
+        <span>📋 Décimo Terceiro</span>
+        <button class="add-btn" onclick="editDecimo(${fi},-1)">＋</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+        <span style="font-size:13px;color:var(--text2);">Valor total:</span>
+        <input type="number" value="${d.valorTotal||''}" step="0.01" placeholder="0,00" style="width:130px;font-size:13px;"
+          onchange="D.funcionarios[${fi}].decimo.valorTotal=parseFloat(this.value)||0;save();">
+      </div>
+      ${(d.itens||[]).length?`
+      <table><thead><tr><th></th><th>Descrição</th><th>Valor</th><th>Data</th><th>Status</th><th></th></tr></thead><tbody>
+      ${(d.itens||[]).map((it,j)=>`<tr>
+        <td><input type="checkbox" ${it.pago?'checked':''} onchange="D.funcionarios[${fi}].decimo.itens[${j}].pago=this.checked;save();renderFuncionariosPage()"></td>
+        <td style="font-size:13px;">${it.desc}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${brl(it.val)}</td>
+        <td style="font-size:12px;color:var(--text2);">${it.data||'—'}</td>
+        <td><span class="badge ${it.pago?'badge-paid':'badge-pending'}">${it.pago?'Pago':'Pend.'}</span></td>
+        <td><div class="row-actions">
+          <button class="action-btn" onclick="editDecimo(${fi},${j})">✏️</button>
+          <button class="action-btn" onclick="D.funcionarios[${fi}].decimo.itens.splice(${j},1);save();renderFuncionariosPage()">🗑️</button>
+        </div></td>
+      </tr>`).join('')}
+      </tbody></table>
+      ${d.valorTotal?`<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:8px;">
+        <span>Restante</span>
+        <span style="font-family:'JetBrains Mono',monospace;color:${(d.valorTotal-totalLanc)>0?'var(--red)':'var(--green)'};">${brl(d.valorTotal-totalLanc)}</span>
+      </div>`:''}`
+      :'<div style="font-size:13px;color:var(--text3);text-align:center;padding:16px;">Nenhum lançamento.</div>'}
     </div>
-    ${(d.itens||[]).length?`<table><thead><tr><th></th><th>Descrição</th><th>Valor</th><th>Data</th><th>Status</th><th></th></tr></thead><tbody>
-    ${(d.itens||[]).map((it,j)=>`<tr><td><input type="checkbox" ${it.pago?'checked':''} onchange="D.funcionarios[${fi}].decimo.itens[${j}].pago=this.checked;save();renderFuncionariosPage()"></td>
-    <td>${it.desc}</td><td style="font-family:'DM Mono',monospace;">${brl(it.val)}</td><td>${it.data||'—'}</td>
-    <td><span class="badge ${it.pago?'badge-paid':'badge-pending'}">${it.pago?'Pago':'Pend.'}</span></td>
-    <td><div class="row-actions"><button class="action-btn" onclick="editDecimo(${fi},${j})">✏️</button>
-    <button class="action-btn" onclick="D.funcionarios[${fi}].decimo.itens.splice(${j},1);save();renderFuncionariosPage()">🗑️</button></div></td></tr>`).join('')}
-    </tbody></table>`:'<div style="font-size:13px;color:var(--text3);text-align:center;padding:8px;">Nenhum lançamento.</div>'}
-    ${d.valorTotal?`<div class="sal-total"><span>Restante</span><span class="${(d.valorTotal-totalLanc)>0?'red':'green'}">${brl(d.valorTotal-totalLanc)}</span></div>`:''}
-  </div>
-  <div class="card" style="margin-top:12px;">
-    <div class="card-title">🏖️ Férias</div>
-    <div class="field-wrap">
-      <label class="field-label">Período aquisitivo</label>
-      <input type="text" value="${fe.referencia||''}" placeholder="Ex: 01/11/2025 a 30/10/2026" style="max-width:300px;"
-        onchange="D.funcionarios[${fi}].ferias.referencia=this.value;save();">
+
+    <!-- Férias -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;"><span>🏖️ Férias</span></div>
+      <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+        <label class="field-label">PERÍODO AQUISITIVO</label>
+        <input type="text" value="${fe.referencia||''}" placeholder="Ex: 01/11/2025 a 30/10/2026"
+          onchange="D.funcionarios[${fi}].ferias.referencia=this.value;save();">
+      </div>
+      ${(fe.periodos||[]).map((p,j)=>`
+      <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;">${p.label}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
+          <div><label class="field-label">INÍCIO</label><input type="date" value="${p.inicio||''}" onchange="D.funcionarios[${fi}].ferias.periodos[${j}].inicio=this.value;save();renderFuncionariosPage();"></div>
+          <div><label class="field-label">VOLTA</label><input type="date" value="${p.volta||''}" onchange="D.funcionarios[${fi}].ferias.periodos[${j}].volta=this.value;save();renderFuncionariosPage();"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <label class="field-label" style="margin:0;white-space:nowrap;">Dias gozados:</label>
+          <input type="number" value="${parseInt(p.dias)||''}" placeholder="0" min="0" max="30" style="width:70px;"
+            onchange="D.funcionarios[${fi}].ferias.periodos[${j}].dias=parseInt(this.value)||0;save();renderFuncionariosPage();">
+        </div>
+      </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
+        <span style="color:var(--text2);">Total gozado</span>
+        <span style="font-weight:600;font-family:'JetBrains Mono',monospace;">${totalDias} / 30 dias</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;">
+        <span style="color:var(--text2);">Restante</span>
+        <span style="font-weight:700;font-family:'JetBrains Mono',monospace;color:${restante<0?'var(--red)':'var(--green)'};">${restante} dias</span>
+      </div>
     </div>
-    ${(fe.periodos||[]).map((p,j)=>`<div style="display:grid;grid-template-columns:110px 1fr 1fr 80px;gap:6px;align-items:center;margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:500;">${p.label}</span>
-      <input type="date" value="${p.inicio||''}" onchange="D.funcionarios[${fi}].ferias.periodos[${j}].inicio=this.value;save();renderFuncionariosPage();">
-      <input type="date" value="${p.volta||''}" onchange="D.funcionarios[${fi}].ferias.periodos[${j}].volta=this.value;save();renderFuncionariosPage();">
-      <input type="number" value="${parseInt(p.dias)||''}" placeholder="0" min="0" max="30"
-        onchange="D.funcionarios[${fi}].ferias.periodos[${j}].dias=parseInt(this.value)||0;save();renderFuncionariosPage();">
-    </div>`).join('')}
-    <div class="sal-row"><span>Dias gozados</span><span style="font-weight:600;">${totalDias} / 30</span></div>
-    <div class="sal-row"><span>Dias restantes</span><span style="font-weight:600;color:${restante<0?'var(--red)':'var(--text)'};">${restante}</span></div>
   </div>`;
 }
 
@@ -1325,6 +1514,17 @@ function itemForm(it){
 window.saveItem=()=>{
   const it={desc:gv('it-desc'),val:gn('it-val'),venc:gv('it-venc'),forma:gv('it-forma'),pago:false};
   if(!it.desc){showToast('Preencha a descrição.');return;}
+
+  // Se for item de bloco personalizado
+  if(blocoCTX.gi>=0){
+    const {tipo,gi:gi_idx,ii} = blocoCTX;
+    if(!D[tipo][gi_idx].itens) D[tipo][gi_idx].itens=[];
+    if(ii>=0) D[tipo][gi_idx].itens[ii]={...D[tipo][gi_idx].itens[ii],...it};
+    else D[tipo][gi_idx].itens.push(it);
+    blocoCTX={tipo:'',gi:-1,ii:-1};
+    save(); closeModal('item'); renderCurrent(); return;
+  }
+
   if(!D[itemKey]) D[itemKey]=[];
   if(itemIdx>=0) D[itemKey][itemIdx]={...D[itemKey][itemIdx],...it};
   else D[itemKey].push(it);
@@ -1402,7 +1602,11 @@ function renderCurrent(){
   const renders={empresa:renderEmpresa,funcionarios:renderFuncionariosPage,pessoal:renderPessoal,dashboard:renderDash};
   if(renders[currentPage])renders[currentPage]();
 }
-function renderAll(){ renderDash(); }
+function renderAll(){
+  renderDash();
+  // Sync mes bars on current page
+  ['mes-bar','mes-bar-emp','mes-bar-func','mes-bar-pes','mes-bar-minha'].forEach(id=>renderMesBar(id));
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  ESCALA / FÉRIAS
@@ -1598,7 +1802,7 @@ function renderPeriodosFerias(){
       if(userRole==='admin')html+=`<button class="add-btn" onclick="editParcela('${per.id}',null,event)"><i class="ti ti-plus"></i> parcela</button>`;
       html+=`</div>
           <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${emp.mid};"></div></div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;font-family:'DM Mono',monospace;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;font-family:'JetBrains Mono',monospace;">
             <span>${used}d usados</span><span>${per.totalDays-used}d restantes de ${per.totalDays}d</span>
           </div>
         </div>
