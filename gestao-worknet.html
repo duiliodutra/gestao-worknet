@@ -550,18 +550,56 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db   = firebase.firestore(); // gestao-worknet (escala/férias + novos dados)
 
-// ── Firebase ANTIGO: somente leitura para dados financeiros ──
-const FIREBASE_CONFIG_FIN = {
-  apiKey: "AIzaSyCpoa6aWVB8Ci4lH8A2eATOK5kubdC9cqg",
-  authDomain: "financeiro-pessoal-cd1c0.firebaseapp.com",
-  projectId: "financeiro-pessoal-cd1c0",
-  storageBucket: "financeiro-pessoal-cd1c0.firebasestorage.app",
-  messagingSenderId: "378029746975",
-  appId: "1:378029746975:web:e2e8b823843ae17ac91e2a"
-};
-const appFin = firebase.initializeApp(FIREBASE_CONFIG_FIN, 'financeiro');
-const dbFin  = appFin.firestore(); // somente leitura — nunca escrevemos aqui
-const ADMIN_UID_FIN = "2wTQICxbEaZKwH6WKBgQ32m7lVj1"; // uid do admin no banco antigo
+// ── Firebase ANTIGO: acesso via REST API (somente leitura) ──
+const FIN_PROJECT   = "financeiro-pessoal-cd1c0";
+const FIN_API_KEY   = "AIzaSyCpoa6aWVB8Ci4lH8A2eATOK5kubdC9cqg";
+const ADMIN_UID_FIN = "2wTQICxbEaZKwH6WKBgQ32m7lVj1";
+
+// Converte documento Firestore REST para objeto JS
+function firestoreToObj(fields) {
+  if (!fields) return {};
+  const result = {};
+  for (const [key, val] of Object.entries(fields)) {
+    result[key] = firestoreValue(val);
+  }
+  return result;
+}
+function firestoreValue(val) {
+  if (val.stringValue  !== undefined) return val.stringValue;
+  if (val.integerValue !== undefined) return parseInt(val.integerValue);
+  if (val.doubleValue  !== undefined) return parseFloat(val.doubleValue);
+  if (val.booleanValue !== undefined) return val.booleanValue;
+  if (val.nullValue    !== undefined) return null;
+  if (val.arrayValue   !== undefined) return (val.arrayValue.values||[]).map(firestoreValue);
+  if (val.mapValue     !== undefined) return firestoreToObj(val.mapValue.fields);
+  return null;
+}
+
+async function finRestGet(path) {
+  const url = `https://firestore.googleapis.com/v1/projects/${FIN_PROJECT}/databases/(default)/documents/${path}?key=${FIN_API_KEY}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`REST ${res.status}`);
+  const data = await res.json();
+  return firestoreToObj(data.fields);
+}
+
+async function finRestSet(path, obj) {
+  // Converte objeto JS para formato Firestore REST
+  function toFirestore(val) {
+    if (val === null || val === undefined) return { nullValue: null };
+    if (typeof val === 'boolean') return { booleanValue: val };
+    if (typeof val === 'number') return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
+    if (typeof val === 'string') return { stringValue: val };
+    if (Array.isArray(val)) return { arrayValue: { values: val.map(toFirestore) } };
+    if (typeof val === 'object') return { mapValue: { fields: Object.fromEntries(Object.entries(val).map(([k,v])=>[k,toFirestore(v)])) } };
+    return { stringValue: String(val) };
+  }
+  const fields = Object.fromEntries(Object.entries(obj).map(([k,v])=>[k,toFirestore(v)]));
+  const url = `https://firestore.googleapis.com/v1/projects/${FIN_PROJECT}/databases/(default)/documents/${path}?key=${FIN_API_KEY}`;
+  const res = await fetch(url, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ fields }) });
+  if (!res.ok) throw new Error(`REST PATCH ${res.status}: ${await res.text()}`);
+  return true;
+}
 
 // ── Constantes ──
 const EMPLOYEES = [
@@ -632,14 +670,9 @@ window.signInGoogle = async () => {
   try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
   catch(e){ showToast('Erro: '+e.message); }
 };
-window.signInGuest = async () => {
-  currentUser=null; userRole='guest';
-  try { await appFin.auth().signInAnonymously(); } catch(e) {}
-  applyRole(); startApp();
-};
+window.signInGuest = () => { currentUser=null; userRole='guest'; applyRole(); startApp(); };
 window.doSignOut = async () => {
   if(currentUser) await auth.signOut();
-  try { await appFin.auth().signOut(); } catch(e) {}
   currentUser=null; userRole='guest'; uid=null;
   gi('topbar').style.display='none';
   gi('app-layout').style.display='none';
@@ -659,15 +692,6 @@ auth.onAuthStateChanged(async user => {
       const found = FUNCIONARIO_EMAILS.find(f=>f.email.toLowerCase()===email);
       if(found){ userRole='funcionario'; myEmpName=found.nome; }
       else { userRole='guest'; }
-    }
-    // Autenticar no banco antigo com o mesmo token Google
-    try {
-      const idToken = await user.getIdToken();
-      const credential = firebase.auth.GoogleAuthProvider.credential(null, idToken);
-      await appFin.auth().signInWithCredential(credential);
-    } catch(e) {
-      // Se falhar, tenta login anônimo no banco antigo (apenas leitura)
-      try { await appFin.auth().signInAnonymously(); } catch(e2) { console.warn('Auth secundária falhou:', e2); }
     }
     applyRole(); startApp();
   } else {
@@ -756,26 +780,26 @@ function dadosVazios(){
 
 let saveTimer=null;
 function save(){
-  if(!uid||!mesAtivo||userRole!=='admin') return;
+  if(!mesAtivo||userRole!=='admin') return;
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    // Salva no banco ANTIGO para manter compatibilidade com o sistema financeiro
-    dbFin.collection('usuarios').doc(ADMIN_UID_FIN).collection('meses').doc(mesAtivo).set(D)
-      .then(()=>showToast('Salvo ✓')).catch(e=>{
-        console.error('Erro ao salvar no banco financeiro:', e);
-        showToast('Erro ao salvar');
-      });
+  saveTimer=setTimeout(async ()=>{
+    try{
+      await finRestSet(`usuarios/${ADMIN_UID_FIN}/meses/${mesAtivo}`, D);
+      showToast('Salvo ✓');
+    }catch(e){
+      console.error('Erro ao salvar:', e);
+      showToast('Erro ao salvar — verifique conexão');
+    }
   },800);
 }
 
 async function loadFinanceiro(ym){
-  if(!uid) return;
   try{
-    // Lê do banco ANTIGO usando o uid fixo do admin (somente leitura)
-    const doc = await dbFin.collection('usuarios').doc(ADMIN_UID_FIN).collection('meses').doc(ym).get();
-    D = doc.exists ? {...dadosVazios(),...doc.data()} : dadosVazios();
+    const data = await finRestGet(`usuarios/${ADMIN_UID_FIN}/meses/${ym}`);
+    D = {...dadosVazios(), ...data};
+    console.log('Dados financeiros carregados:', ym, Object.keys(data));
   }catch(e){
-    console.warn('Erro ao carregar financeiro antigo:', e);
+    console.warn('Sem dados para', ym, e.message);
     D = dadosVazios();
   }
 }
@@ -812,7 +836,7 @@ async function copiarMesAnterior(){
   const meses=getMeses(); const idx=meses.indexOf(mesAtivo);
   if(idx<=0){alert('Sem mês anterior.');return;}
   const ant=meses[idx-1]; let prev={};
-  try{const doc=await dbFin.collection('usuarios').doc(ADMIN_UID_FIN).collection('meses').doc(ant).get();if(doc.exists)prev=doc.data();}catch(e){}
+  try{ prev = await finRestGet(`usuarios/${ADMIN_UID_FIN}/meses/${ant}`); }catch(e){}
   if(!prev.boletos&&!prev.funcionarios){alert('Sem dados.');return;}
   const reset=arr=>(arr||[]).map(x=>({...x,pago:false}));
   D.boletos=reset(prev.boletos);D.links=reset(prev.links);D.cartoes=reset(prev.cartoes);
