@@ -335,7 +335,7 @@ body.readonly [data-admin]{display:none!important;}
         <button class="btn-mes-action" onclick="adicionarMes()">＋ Novo mês</button>
       </div>
       <div class="page-body">
-        <div class="grid4" style="margin-bottom:14px;" id="dash-stats"></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;" id="dash-stats"></div>
         <div class="grid2" id="dash-cards"></div>
       </div>
     </div>
@@ -957,32 +957,64 @@ function renderDash(){
   const gt=GT(); const prev=D.prevRec||0; const rec=D.recebido||0;
   gi('dash-mes-label').textContent=mesLabel(mesAtivo);
 
-  // ── Top stats ──
-  const totalContas=(D.sicredi||0)+(D.santander||0)+(D.dinheiro||0);
+  // ── Inputs editáveis ──
+  const emConta=(D.sicredi||0)+(D.santander||0)+(D.dinheiro||0);
+  const aReceber=prev-rec;
+  const faltaPagar=gt-emConta;
+  const prevCaixaFinal=emConta+aReceber-gt;
+
   gi('dash-stats').innerHTML=`
-    <div class="stat-card">
-      <div class="stat-lbl" style="margin-bottom:4px;">Total a pagar</div>
-      <div class="stat-val red">${brl(gt)}</div>
+    <!-- Barra de inputs -->
+    <div style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text);">${mesLabel(mesAtivo)}</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text3);">Prev. recebimento:</label>
+        <input class="receita-input" style="width:120px;font-size:13px;" value="${prev||''}"
+          placeholder="0,00"
+          onblur="D.prevRec=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text3);">Sicredi:</label>
+        <input class="receita-input" style="width:100px;font-size:13px;color:var(--accent);" value="${D.sicredi||''}"
+          placeholder="0,00"
+          onblur="D.sicredi=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text3);">Santander:</label>
+        <input class="receita-input" style="width:100px;font-size:13px;color:#c0533a;" value="${D.santander||''}"
+          placeholder="0,00"
+          onblur="D.santander=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text3);">Dinheiro:</label>
+        <input class="receita-input" style="width:100px;font-size:13px;color:var(--green);" value="${D.dinheiro||''}"
+          placeholder="0,00"
+          onblur="D.dinheiro=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text3);">Recebido:</label>
+        <input class="receita-input" style="width:100px;font-size:13px;color:var(--green);font-weight:700;" value="${rec||''}"
+          placeholder="0,00"
+          onblur="D.recebido=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;save();renderDash();"
+          onkeydown="if(event.key==='Enter')this.blur();">
+      </div>
     </div>
-    <div class="stat-card" style="cursor:pointer;" onclick="focusInput('inp-prev')">
-      <div class="stat-lbl" style="margin-bottom:4px;">Prev. fechamento</div>
-      <input id="inp-prev" class="receita-input" style="width:100%;font-size:18px;font-weight:700;"
-        value="${brl(prev)}"
-        onfocus="this.value='${prev||''}'"
-        onblur="D.prevRec=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.prevRec);save();renderDash();"
-        onkeydown="if(event.key==='Enter')this.blur();">
-    </div>
-    <div class="stat-card" style="cursor:pointer;" onclick="focusInput('inp-rec')">
-      <div class="stat-lbl" style="margin-bottom:4px;">Recebido</div>
-      <input id="inp-rec" class="receita-input" style="width:100%;font-size:18px;font-weight:700;color:var(--green);"
-        value="${brl(rec)}"
-        onfocus="this.value='${rec||''}'"
-        onblur="D.recebido=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.recebido);save();renderDash();"
-        onkeydown="if(event.key==='Enter')this.blur();">
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl" style="margin-bottom:4px;">Saldo</div>
-      <div class="stat-val" style="color:${(rec-gt)>=0?'var(--green)':'var(--red)'};">${brl(rec-gt)}</div>
+
+    <!-- Cards de stats -->
+    <div class="stat-card"><div class="stat-lbl">Total de contas</div><div class="stat-val red">${brl(D.totalContas||gt)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Total pendente</div><div class="stat-val red">${brl(gt)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Prev. recebimento</div><div class="stat-val green">${brl(prev)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Já recebido</div><div class="stat-val green">${brl(rec)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">A receber ainda</div><div class="stat-val" style="color:var(--amber);">${brl(aReceber)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Em conta</div><div class="stat-val">${brl(emConta)}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Falta pagar</div><div class="stat-val red">${brl(faltaPagar)}</div></div>
+    <div class="stat-card" style="border:1px solid ${prevCaixaFinal>=0?'#b7dfb9':'#fca5a5'};">
+      <div class="stat-lbl">Prev. caixa final</div>
+      <div class="stat-val" style="color:${prevCaixaFinal>=0?'var(--green)':'var(--red)'};">${brl(prevCaixaFinal)}</div>
     </div>`;
 
   // ── Contas bancárias ──
@@ -991,42 +1023,7 @@ function renderDash(){
   const dinheiro  = D.dinheiro  || 0;
   const totalContas2 = sicredi + santander + dinheiro;
 
-  const contasHtml = `<div class="receita-card" style="margin-bottom:14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div class="receita-title" style="margin:0;">🏦 SALDO EM CONTA</div>
-      <span style="font-size:12px;color:var(--text3);">clique nos valores para editar</span>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-      <div style="background:var(--accent-bg);border-radius:var(--radius);padding:12px 14px;">
-        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px;">SICREDI</div>
-        <input class="receita-input" style="width:100%;font-size:16px;font-weight:700;color:var(--accent);"
-          value="${brl(sicredi)}"
-          onfocus="this.value='${sicredi||''}'"
-          onblur="D.sicredi=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.sicredi);save();renderDash();"
-          onkeydown="if(event.key==='Enter')this.blur();">
-      </div>
-      <div style="background:#fdf8f6;border-radius:var(--radius);padding:12px 14px;">
-        <div style="font-size:11px;font-weight:600;color:#c0533a;margin-bottom:6px;">SANTANDER</div>
-        <input class="receita-input" style="width:100%;font-size:16px;font-weight:700;color:#c0533a;"
-          value="${brl(santander)}"
-          onfocus="this.value='${santander||''}'"
-          onblur="D.santander=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.santander);save();renderDash();"
-          onkeydown="if(event.key==='Enter')this.blur();">
-      </div>
-      <div style="background:var(--green-bg);border-radius:var(--radius);padding:12px 14px;">
-        <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px;">DINHEIRO</div>
-        <input class="receita-input" style="width:100%;font-size:16px;font-weight:700;color:var(--green);"
-          value="${brl(dinheiro)}"
-          onfocus="this.value='${dinheiro||''}'"
-          onblur="D.dinheiro=parseFloat(this.value.replace(/[^0-9,.]/g,'').replace(',','.'))||0;this.value=brl(D.dinheiro);save();renderDash();"
-          onkeydown="if(event.key==='Enter')this.blur();">
-      </div>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;border-top:1px solid var(--border);margin-top:12px;">
-      <span style="font-size:13px;font-weight:600;color:var(--text);">Total disponível</span>
-      <span style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:${totalContas2>0?'var(--green)':'var(--text)'};">${brl(totalContas2)}</span>
-    </div>
-  </div>`;
+
 
   // ── Vencimentos próximos ──
   const vencs = getVencimentos();
@@ -1094,7 +1091,6 @@ function renderDash(){
     </div>`;
 
   gi('dash-cards').innerHTML = `
-    ${contasHtml}
     ${vencHtml}
     <div class="card" style="margin-top:0;">
       <div class="card-title" style="margin-bottom:12px;">📋 Resumo do mês — pendentes</div>
