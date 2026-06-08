@@ -668,6 +668,7 @@ let calEvents   = [];
 let periods     = [];
 let currentPage = '';
 let editingCalId    = null;
+let blocoCTX = {tipo:'', gi:-1, ii:-1};
 let editingPeriodId = null;
 let editingParcelaId= null;
 let editingItemCtx  = null;
@@ -850,8 +851,6 @@ async function trocarMes(ym){
   if(uid) save();
   mesAtivo=ym;
   await loadFinanceiro(ym);
-  // Re-render all mes bars to sync active state
-  ['mes-bar','mes-bar-emp','mes-bar-func','mes-bar-pes','mes-bar-minha'].forEach(id=>renderMesBar(id));
   renderAll();
 }
 
@@ -865,8 +864,7 @@ function mesLabel(ym){const[y,m]=ym.split('-');return MESES[parseInt(m)-1]+' '+y
 function renderMesBar(id){
   const el=gi(id); if(!el) return;
   el.innerHTML=getMeses().map(ym=>`<button class="mes-btn ${ym===mesAtivo?'active':''}" onclick="trocarMes('${ym}')">${mesLabel(ym)}</button>`).join('');
-  // Scroll active button into view
-  setTimeout(()=>{const active=el.querySelector('.mes-btn.active');if(active)active.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});},50);
+  setTimeout(()=>{const a=el.querySelector('.mes-btn.active');if(a)a.scrollIntoView({block:'nearest',inline:'center'});},100);
 }
 
 async function adicionarMes(){
@@ -1268,11 +1266,10 @@ window.addBloco = tipo => {
 };
 
 
-window.newBlocoItem=(tipo,gi)=>{ blocoCTX={tipo,gi,ii:-1}; gi2('item-modal-title').textContent='Novo item'; gi2('item-modal-body').innerHTML=itemForm({}); openModal('item'); };
-window.editBlocoItem=(tipo,gi,ii)=>{ blocoCTX={tipo,gi,ii}; const it=(D[tipo][gi].itens||[])[ii]||{}; gi2('item-modal-title').textContent='Editar item'; gi2('item-modal-body').innerHTML=itemForm(it); openModal('item'); };
+window.newBlocoItem=(tipo,gidx)=>{ blocoCTX={tipo,gi:gidx,ii:-1}; itemKey=''; itemIdx=-1; gi('item-modal-title').textContent='Novo item'; gi('item-modal-body').innerHTML=itemForm({}); openModal('item'); };
+window.editBlocoItem=(tipo,gidx,ii)=>{ blocoCTX={tipo,gi:gidx,ii}; itemKey=''; itemIdx=-1; const it=(D[tipo][gidx].itens||[])[ii]||{}; gi('item-modal-title').textContent='Editar item'; gi('item-modal-body').innerHTML=itemForm(it); openModal('item'); };
 
 // helper aliases para evitar conflito de nome com a função gi()
-function gi2(id){return document.getElementById(id);}
 
 // ── Funcionários (admin) ──
 function renderFuncionariosPage(){
@@ -1503,8 +1500,8 @@ function renderMinhaPagina(){
 
 // ── Item modals ──
 let itemKey=''; let itemIdx=-1;
-function newItem(key){ itemKey=key; itemIdx=-1; gi('item-modal-title').textContent='Novo item'; gi('item-modal-body').innerHTML=itemForm({}); openModal('item'); }
-function editItem(key,idx){ itemKey=key; itemIdx=idx; const it=(D[key]||[])[idx]||{}; gi('item-modal-title').textContent='Editar item'; gi('item-modal-body').innerHTML=itemForm(it); openModal('item'); }
+function newItem(key){ itemKey=key; itemIdx=-1; blocoCTX={tipo:'',gi:-1,ii:-1}; gi('item-modal-title').textContent='Novo item'; gi('item-modal-body').innerHTML=itemForm({}); openModal('item'); }
+function editItem(key,idx){ const it=(D[key]||[])[idx]||{}; itemKey=key; itemIdx=idx; blocoCTX={tipo:'',gi:-1,ii:-1}; gi('item-modal-title').textContent='Editar item'; gi('item-modal-body').innerHTML=itemForm(it); openModal('item'); }
 function itemForm(it){
   return`<div class="field-wrap"><label class="field-label">DESCRIÇÃO</label><input type="text" id="it-desc" value="${it.desc||''}"></div>
   <div class="field-wrap"><label class="field-label">VALOR (R$)</label><input type="number" id="it-val" step="0.01" value="${it.val||''}"></div>
@@ -1515,16 +1512,17 @@ window.saveItem=()=>{
   const it={desc:gv('it-desc'),val:gn('it-val'),venc:gv('it-venc'),forma:gv('it-forma'),pago:false};
   if(!it.desc){showToast('Preencha a descrição.');return;}
 
-  // Se for item de bloco personalizado
-  if(blocoCTX.gi>=0){
-    const {tipo,gi:gi_idx,ii} = blocoCTX;
-    if(!D[tipo][gi_idx].itens) D[tipo][gi_idx].itens=[];
-    if(ii>=0) D[tipo][gi_idx].itens[ii]={...D[tipo][gi_idx].itens[ii],...it};
-    else D[tipo][gi_idx].itens.push(it);
+  // Item de bloco personalizado
+  if(blocoCTX && blocoCTX.gi>=0){
+    const tipo=blocoCTX.tipo, gidx=blocoCTX.gi, ii=blocoCTX.ii;
+    if(!D[tipo][gidx].itens) D[tipo][gidx].itens=[];
+    if(ii>=0) D[tipo][gidx].itens[ii]={...D[tipo][gidx].itens[ii],...it};
+    else D[tipo][gidx].itens.push(it);
     blocoCTX={tipo:'',gi:-1,ii:-1};
     save(); closeModal('item'); renderCurrent(); return;
   }
 
+  // Item de seção fixa
   if(!D[itemKey]) D[itemKey]=[];
   if(itemIdx>=0) D[itemKey][itemIdx]={...D[itemKey][itemIdx],...it};
   else D[itemKey].push(it);
@@ -1604,7 +1602,9 @@ function renderCurrent(){
 }
 function renderAll(){
   renderDash();
-  // Sync mes bars on current page
+  renderMesBarsAll();
+}
+function renderMesBarsAll(){
   ['mes-bar','mes-bar-emp','mes-bar-func','mes-bar-pes','mes-bar-minha'].forEach(id=>renderMesBar(id));
 }
 
