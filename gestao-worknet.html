@@ -876,26 +876,45 @@ async function adicionarMes(){
 }
 
 async function copiarMesAnterior(){
-  if(!confirm('Copiar contas do mês anterior?')) return;
+  if(!confirm('Copiar contas do mês anterior? As datas serão avançadas em 1 mês automaticamente.')) return;
   const meses=getMeses(); const idx=meses.indexOf(mesAtivo);
   if(idx<=0){alert('Sem mês anterior.');return;}
   const ant=meses[idx-1]; let prev={};
   try{
-    // Tenta novo banco primeiro
     const doc = await db.collection('usuarios').doc(uid).collection('meses').doc(ant).get();
     if(doc.exists) prev = doc.data();
     else prev = await finRestGet(`usuarios/${ADMIN_UID_FIN}/meses/${ant}`);
   }catch(e){}
   if(!prev.boletos&&!prev.funcionarios){alert('Sem dados.');return;}
-  const reset=arr=>(arr||[]).map(x=>({...x,pago:false}));
-  D.boletos=reset(prev.boletos);D.links=reset(prev.links);D.cartoes=reset(prev.cartoes);
-  D.emprestimos=reset(prev.emprestimos);D.empresa=reset(prev.empresa);
-  D.pessoal=reset(prev.pessoal);D.cartoesPes=reset(prev.cartoesPes);
-  D.mae={pago:reset(prev.mae?.pago),rec:reset(prev.mae?.rec)};
+
+  // Avança data de vencimento em 1 mês
+  const avancarData = venc => {
+    if(!venc) return venc;
+    try{
+      const d = new Date(venc+'T12:00:00');
+      d.setMonth(d.getMonth()+1);
+      return d.toISOString().slice(0,10);
+    }catch(e){ return venc; }
+  };
+
+  const reset = arr => (arr||[]).map(x=>({...x, pago:false, venc:avancarData(x.venc)}));
+  const resetGrupo = arr => (arr||[]).map(g=>({...g, itens:reset(g.itens||[])}));
+
+  D.boletos    = reset(prev.boletos);
+  D.links      = reset(prev.links);
+  D.cartoes    = reset(prev.cartoes);
+  D.emprestimos= reset(prev.emprestimos);
+  D.empresa    = reset(prev.empresa);
+  D.pessoal    = reset(prev.pessoal);
+  D.cartoesPes = reset(prev.cartoesPes);
+  D.gruposEmp  = resetGrupo(prev.gruposEmp);
+  D.grupos     = resetGrupo(prev.grupos);
+  // Funcionários: copia estrutura mas não avança datas (salário não tem vencimento mensal fixo)
   D.funcionarios=(prev.funcionarios||[]).map(f=>({...f,pago:false}));
-  D.gruposEmp=(prev.gruposEmp||[]).map(g=>({...g,itens:reset(g.itens)}));
-  D.grupos=(prev.grupos||[]).map(g=>({...g,itens:reset(g.itens)}));
-  save(); renderAll(); showToast('Copiado ✓');
+  // Mantém títulos dos blocos
+  D.titulosBlocos = prev.titulosBlocos||{};
+
+  save(); renderAll(); showToast('Copiado com datas atualizadas ✓');
 }
 
 function calcSal(f){
@@ -908,11 +927,12 @@ function calcSal(f){
 
 function tFunc(){return(D.funcionarios||[]).filter(f=>!f.pago).reduce((s,f)=>s+calcSal(f).liquido,0);}
 function tArr(arr){return(arr||[]).filter(x=>!x.pago).reduce((s,x)=>s+(x.val||x.total||0),0);}
+function tArrPagar(arr){ return (arr||[]).filter(x=>!x.pago&&(!x.tipo||x.tipo==='pagar')).reduce((s,x)=>s+(x.val||x.total||0),0); }
 function GT(){
   return tArr(D.boletos)+tArr(D.links)+tArr(D.cartoes)+tArr(D.emprestimos)+tArr(D.empresa)+
     tFunc()+tArr(D.pessoal)+tArr(D.cartoesPes)+
-    (D.gruposEmp||[]).reduce((t,g)=>t+tArr(g.itens||[]),0)+
-    (D.grupos||[]).reduce((t,g)=>t+tArr(g.itens||[]),0);
+    (D.gruposEmp||[]).reduce((t,g)=>t+tArrPagar(g.itens),0)+
+    (D.grupos||[]).reduce((t,g)=>t+tArrPagar(g.itens),0);
 }
 
 function vencBadge(venc,pago){
@@ -943,8 +963,8 @@ function getVencimentos(){
   add('Empresa',      D.empresa);
   add('Pessoal',      D.pessoal);
   add('Cartão pes.',  D.cartoesPes);
-  (D.gruposEmp||[]).forEach(g => add(g.titulo||'Empresa', g.itens||[]));
-  (D.grupos||[]).forEach(g => add(g.titulo||'Pessoal', g.itens||[]));
+  (D.gruposEmp||[]).forEach(g => add(g.titulo||g.nome||'Empresa', (g.itens||[]).filter(x=>!x.tipo||x.tipo==='pagar')));
+  (D.grupos||[]).forEach(g => add(g.titulo||g.nome||'Pessoal', (g.itens||[]).filter(x=>!x.tipo||x.tipo==='pagar')));
   return items.sort((a,b) => a.diff - b.diff);
 }
 
@@ -1058,12 +1078,12 @@ function renderDash(){
   const tEmpCart = tArr(D.cartoes);
   const tEmprest = tArr(D.emprestimos);
   const tEmpOut  = tArr(D.empresa);
-  const tGrupsEmp= (D.gruposEmp||[]).reduce((t,g)=>t+tArr((g.itens||[]).filter(x=>x.tipo==='pagar')),0);
+  const tGrupsEmp= (D.gruposEmp||[]).reduce((t,g)=>t+tArrPagar(g.itens),0);
   const totalEmp = tEmpBol+tEmpLink+tEmpCart+tEmprest+tEmpOut+tGrupsEmp;
 
   const tPesContas= tArr(D.pessoal);
   const tPesCart  = tArr(D.cartoesPes);
-  const tPesEmp   = (D.grupos||[]).reduce((t,g)=>t+tArr((g.itens||[]).filter(x=>x.tipo==='pagar')),0);
+  const tPesEmp   = (D.grupos||[]).reduce((t,g)=>t+tArrPagar(g.itens),0);
   const totalPes  = tPesContas+tPesCart+tPesEmp;
 
   const tFuncs = tFunc();
@@ -1107,7 +1127,7 @@ function renderDash(){
           ${tEmprest >0?resumoRow('Empréstimos',    tEmprest, false,false):''}
           ${tEmpOut  >0?resumoRow('Outras contas',  tEmpOut,  false,false):''}
           ${tGrupsEmp>0?resumoRow('Grupos emp.',tGrupsEmp,false,false):''}
-          ${(D.gruposEmp||[]).filter(g=>tArr(g.itens||[])>0).map(g=>resumoRow('  '+g.titulo,tArr(g.itens||[]),false,false)).join('')}
+          ${(D.gruposEmp||[]).filter(g=>tArrPagar(g.itens)>0).map(g=>resumoRow('  '+(g.titulo||g.nome||'Grupo'),tArrPagar(g.itens),false,false)).join('')}
           <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
             <span style="color:var(--accent);">Total empresa</span>
             <span style="font-family:'JetBrains Mono',monospace;color:var(--accent);">${brl(totalEmp)}</span>
@@ -1119,7 +1139,7 @@ function renderDash(){
           <div style="font-size:11px;font-weight:600;color:#c0533a;letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #fdf0ec;">🏠 PESSOAL</div>
           ${tPesContas>0?resumoRow('Contas pessoais',tPesContas,false,false):''}
           ${tPesCart  >0?resumoRow('Cartões pes.',   tPesCart,  false,false):''}
-          ${(D.grupos||[]).filter(g=>tArr(g.itens||[])>0).map(g=>resumoRow(g.titulo,tArr(g.itens||[]),false,false)).join('')}
+          ${(D.grupos||[]).filter(g=>tArrPagar(g.itens)>0).map(g=>resumoRow(g.titulo||g.nome||'Grupo',tArrPagar(g.itens),false,false)).join('')}
           <div style="display:flex;justify-content:space-between;padding:8px 0 2px;font-weight:700;font-size:13px;border-top:1px solid var(--border);margin-top:6px;">
             <span style="color:#c0533a;">Total pessoal</span>
             <span style="font-family:'JetBrains Mono',monospace;color:#c0533a;">${brl(totalPes)}</span>
@@ -1182,7 +1202,7 @@ function renderListSection(s){
 // ── Render bloco personalizado ──
 function renderBlocoCustom(grupo, gi_idx, tipoBloco){
   const itens=grupo.itens||[];
-  const titulo=grupo.titulo||'Novo bloco';
+  const titulo=grupo.titulo||grupo.nome||'Novo bloco'; // compatível com banco antigo (nome) e novo (titulo)
   const rows=itens.map((it,i)=>{
     return '<tr>'
       +'<td><input type="checkbox"'+(it.pago?' checked':'')+' onchange="D[\''+tipoBloco+'\']['+gi_idx+'].itens['+i+'].pago=this.checked;save();renderCurrent()"></td>'
@@ -1195,7 +1215,7 @@ function renderBlocoCustom(grupo, gi_idx, tipoBloco){
       +'<button class="action-btn" onclick="D[\''+tipoBloco+'\']['+gi_idx+'].itens.splice('+i+',1);save();renderCurrent()">🗑️</button>'
       +'</div></td></tr>';
   }).join('');
-  const total=tArr(itens);
+  const total=tArrPagar(itens);
   const emptyBtn='<button class="add-btn" onclick="newBlocoItem(\''+tipoBloco+'\','+gi_idx+')">＋ Adicionar</button>';
   return '<div class="card" style="margin-bottom:12px;border-left:3px solid var(--accent);">'
     +'<div class="card-title">'
@@ -1263,9 +1283,12 @@ window.editTitulo = key => {
   save(); renderCurrent();
 };
 window.editTituloBloco = (tipo, idx) => {
-  const novo = prompt('Novo título:', D[tipo][idx].titulo||'Novo bloco');
+  const atual = D[tipo][idx].titulo||D[tipo][idx].nome||'Novo bloco';
+  const novo = prompt('Novo título:', atual);
   if(novo===null) return;
-  D[tipo][idx].titulo=novo.trim()||'Novo bloco';
+  const val = novo.trim()||atual;
+  D[tipo][idx].titulo = val;
+  D[tipo][idx].nome   = val; // compatibilidade com banco antigo
   save(); renderCurrent();
 };
 window.addBloco = tipo => {
