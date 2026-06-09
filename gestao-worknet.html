@@ -888,12 +888,17 @@ async function copiarMesAnterior(){
   if(!prev.boletos&&!prev.funcionarios){alert('Sem dados.');return;}
 
   // Avança data de vencimento em 1 mês
+  // Avança o vencimento para o mês de destino, mantendo o dia
+  const [destY, destM] = mesAtivo.split('-').map(Number);
   const avancarData = venc => {
     if(!venc) return venc;
     try{
       const d = new Date(venc+'T12:00:00');
-      d.setMonth(d.getMonth()+1);
-      return d.toISOString().slice(0,10);
+      const dia = d.getDate();
+      // Coloca no mês/ano de destino mantendo o dia (ajusta se dia não existe no mês)
+      const ultimoDia = new Date(destY, destM, 0).getDate();
+      const diaFinal = Math.min(dia, ultimoDia);
+      return `${destY}-${String(destM).padStart(2,'0')}-${String(diaFinal).padStart(2,'0')}`;
     }catch(e){ return venc; }
   };
 
@@ -1117,7 +1122,6 @@ function renderDash(){
     </div>`;
 
   gi('dash-cards').innerHTML = `
-    ${vencHtml}
     <div class="card" style="margin-top:0;">
       <div class="card-title" style="margin-bottom:12px;">📋 Resumo do mês</div>
 
@@ -1177,7 +1181,8 @@ function renderDash(){
         <span></span>
         <span style="font-size:16px;font-weight:700;font-family:monospace;text-align:right;color:var(--red);">${brl(totalGeral)}</span>
       </div>
-    </div>`;
+    </div>
+    ${vencHtml}`;
 }
 
 // ── Empresa ──
